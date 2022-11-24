@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import saiga.dto.SignUpDto;
 import saiga.service.UserService;
 
+import javax.validation.Valid;
 import java.util.Map;
 
 @RestController
@@ -20,12 +21,12 @@ public class UserController {
     }
 
     @PostMapping(value = "/login")
-    public HttpEntity<?> login(@RequestBody Map<String, String> mp) {
+    public HttpEntity<?> login(@RequestBody @Valid Map<String, String> mp) {
         return service.login(mp.get("phoneNumber"));
     }
 
     @PostMapping(value = "/sign-up")
-    public HttpEntity<?> signUp(@RequestBody SignUpDto signUpDto) {
+    public HttpEntity<?> signUp(@RequestBody @Valid SignUpDto signUpDto) {
         return service.signUp(signUpDto);
     }
 

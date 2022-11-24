@@ -22,8 +22,11 @@ public class UserSocketController {
     @MessageMapping("/search")
     @SendTo("/socket/users")
     public List<User> greeting(SearchWithField message) throws Exception {
+        System.out.println("message = " + message.getName());
         Thread.sleep(1000); // simulated delay
-        return repository.findAllByFirstName(message.getName());
+        List<User> allByFirstName = repository.findAllByFirstName(message.getName());
+        System.out.println(allByFirstName);
+        return allByFirstName;
     }
 
 
