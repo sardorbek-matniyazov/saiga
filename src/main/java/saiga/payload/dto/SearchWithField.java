@@ -1,4 +1,4 @@
-package saiga.dto;
+package saiga.payload.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
