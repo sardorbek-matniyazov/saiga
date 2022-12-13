@@ -11,6 +11,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import static saiga.utils.constants.ModelConstants._ENUM_LENGTH;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,8 +22,12 @@ public class Role implements GrantedAuthority {
     @GeneratedValue(strategy = javax.persistence.GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "role_name")
+    @Column(name = "role_name", length = _ENUM_LENGTH)
     private RoleEnum role;
+
+    public Role(RoleEnum role) {
+        this.role = role;
+    }
 
     @Override
     public String getAuthority() {

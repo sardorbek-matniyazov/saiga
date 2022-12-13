@@ -7,7 +7,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -15,18 +14,18 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import saiga.security.MyFilter;
-import saiga.security.MyUserDetailsService;
+import saiga.security.CustomUserDetailsService;
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    private final MyUserDetailsService myUserDetailsService;
+    private final CustomUserDetailsService myUserDetailsService;
     private final MyFilter myFilter;
 
     @Autowired
-    public SecurityConfiguration(MyUserDetailsService myUserDetailsService, MyFilter myFilter) {
+    public SecurityConfiguration(CustomUserDetailsService myUserDetailsService, MyFilter myFilter) {
         this.myUserDetailsService = myUserDetailsService;
         this.myFilter = myFilter;
     }
@@ -42,7 +41,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable().cors().disable()
                 .authorizeRequests()
-                .antMatchers("/api/auth/login", "/api/auth/sign-up", "/stomp", "/socket", "/saiga-websocket/**", "/").permitAll()
+                .antMatchers("/api/auth/login", "/api/auth/sign-up", "/stomp", "/socket", "/saiga-websocket/**", "/ws/**", "/").permitAll()
                 .antMatchers(
                         "/v3/api-docs/**",
                         "/swagger-ui/**",

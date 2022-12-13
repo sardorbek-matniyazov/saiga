@@ -8,18 +8,18 @@ import saiga.model.User;
 import saiga.repository.UserRepository;
 
 @Service
-public class MyUserDetailsService implements UserDetailsService {
+public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
     @Autowired
-    public MyUserDetailsService(UserRepository userRepository) {
+    public CustomUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     @Override
     public User loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByPhoneNumber(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new UsernameNotFoundException("User with phone number" + username + " not found"));
     }
 }

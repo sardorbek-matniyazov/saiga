@@ -13,11 +13,12 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         config.enableSimpleBroker("/socket");
-        config.setApplicationDestinationPrefixes("/request");
+        config.setApplicationDestinationPrefixes("/request/");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("/saiga-websocket");
         registry.addEndpoint("/saiga-websocket").withSockJS();
     }
 

@@ -13,7 +13,9 @@ function setConnected(connected) {
 
 function connect() {
     const socket = new SockJS('/saiga-websocket');
-    stompClient = Stomp.over(socket);
+    stompClient = Stomp.client('ws://localhost:3000/saiga-websocket');
+
+
     stompClient.connect({}, function (frame) {
         setConnected(true);
         console.log('Connected: ' + frame);
