@@ -16,7 +16,7 @@ import static saiga.utils.constants.ModelConstants._ENUM_LENGTH;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "role")
+@Entity(name = "roles")
 public class Role implements GrantedAuthority {
     @Id
     @GeneratedValue(strategy = javax.persistence.GenerationType.IDENTITY)

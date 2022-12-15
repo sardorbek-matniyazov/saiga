@@ -14,7 +14,7 @@ import static saiga.utils.constants.ModelConstants._TITLE_LENGTH;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "balance")
+@Entity(name = "address")
 public class Address {
     @Id
     @GeneratedValue(strategy = javax.persistence.GenerationType.IDENTITY)
