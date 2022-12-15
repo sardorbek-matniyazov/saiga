@@ -17,7 +17,6 @@ import javax.persistence.OneToOne;
 public class Direction {
     @Id
     @GeneratedValue(strategy = javax.persistence.GenerationType.IDENTITY)
-    @Column(name = "direction_id")
     private Long id;
 
     @OneToOne
