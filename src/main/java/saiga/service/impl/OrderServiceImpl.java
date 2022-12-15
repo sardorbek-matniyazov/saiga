@@ -9,7 +9,6 @@ import saiga.service.OrderService;
 public class OrderServiceImpl implements OrderService {
     @Override
     public MyResponse createOrder(OrderDto dto) {
-
-        return null;
+        return MyResponse._CREATED.setMessage("Oh Ram Pam Pam");
     }
 }
