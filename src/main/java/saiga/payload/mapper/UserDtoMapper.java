@@ -2,6 +2,7 @@ package saiga.payload.mapper;
 
 import org.springframework.stereotype.Component;
 import saiga.model.User;
+import saiga.model.enums.Status;
 import saiga.payload.dto.UserDTO;
 
 import java.util.function.Function;
@@ -16,7 +17,8 @@ public class UserDtoMapper implements Function<User, UserDTO> {
                 user.getLastName(),
                 user.getPhoneNumber(),
                 user.getLang().toString(),
-                user.getRole().getRole().toString()
+                user.getRole().getRole().toString(),
+                user.getStatus()
         );
     }
 }
