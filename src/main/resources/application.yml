@@ -1,5 +1,5 @@
 server:
-  port: 3000
+  port: 5000
 spring:
   jackson:
     date-format: dd MMMM yyyy HH:mm
@@ -18,4 +18,3 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQL10Dialect
         format_sql: true
         enable_lazy_load_no_trans: true
-# postgres://bbcyllqh:wbje9GcsM8TD2aVYFzcjKrNEy9Dwn8F-@arjuna.db.elephantsql.com/bbcyllqh
