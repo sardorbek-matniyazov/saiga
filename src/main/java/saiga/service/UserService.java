@@ -1,13 +1,13 @@
 package saiga.service;
 
-import saiga.payload.dao.MyResponse;
-import saiga.payload.dto.SignUpDto;
-import saiga.payload.dto.UpdateUserDto;
+import saiga.payload.MyResponse;
+import saiga.payload.request.SignUpRequest;
+import saiga.payload.request.UpdateUserRequest;
 
 public interface UserService {
     MyResponse login(String phoneNumber);
 
-    MyResponse signUp(SignUpDto signUpDto);
+    MyResponse signUp(SignUpRequest signUpDto);
 
-    MyResponse update(Long id, UpdateUserDto signUpDto);
+    MyResponse update(Long id, UpdateUserRequest signUpDto);
 }

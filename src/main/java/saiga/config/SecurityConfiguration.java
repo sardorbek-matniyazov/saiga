@@ -41,7 +41,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable().cors().disable()
                 .authorizeRequests()
-                .antMatchers("/api/auth/login", "/api/auth/sign-up", "/stomp", "/socket", "/saiga-websocket/**", "/ws/**", "/").permitAll()
+                .antMatchers("/api/auth/sign-in", "/api/auth/sign-up", "/stomp", "/socket", "/saiga-websocket/**", "/ws/**", "/").permitAll()
                 .antMatchers(
                         "/v3/api-docs/**",
                         "/swagger-ui/**",
