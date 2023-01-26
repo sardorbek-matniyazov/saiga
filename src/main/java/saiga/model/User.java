@@ -113,8 +113,8 @@ public class User
     }
 
     public void updateWithDto(UpdateUserRequest dto) {
-        this.firstName = dto.firstname();
-        this.lastName = dto.lastname();
+        this.firstName = dto.firstName();
+        this.lastName = dto.lastName();
         this.lang = dto.lang();
         this.phoneNumber = dto.phoneNumber();
     }

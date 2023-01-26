@@ -18,8 +18,8 @@ import java.util.Map;
 @RequestMapping(value = "/api/auth")
 public record UserController(UserService service) {
     @PostMapping(value = "/sign-in")
-    public HttpEntity<?> login(@RequestBody @Valid Map<String, String> mp) {
-        return service.login(mp.get("phoneNumber")).handleResponse();
+    public HttpEntity<?> signIn(@RequestBody @Valid Map<String, String> mp) {
+        return service.signIn(mp.get("phoneNumber")).handleResponse();
     }
 
     @PostMapping(value = "/sign-up")

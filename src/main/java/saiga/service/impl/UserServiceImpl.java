@@ -27,7 +27,7 @@ public record UserServiceImpl(
         UserDtoMapper userDtoMapper
 ) implements UserService {
     @Override
-    public MyResponse login(String phoneNumber) {
+    public MyResponse signIn(String phoneNumber) {
         final String token = jwtProvider.generateToken(phoneNumber);
         return _CREATED
                 .setMessage("Login successfully")
