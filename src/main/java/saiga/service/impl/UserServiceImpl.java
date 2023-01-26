@@ -1,43 +1,31 @@
 package saiga.service.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import saiga.model.Role;
 import saiga.model.User;
-import saiga.payload.dao.MyResponse;
-import saiga.payload.dto.SignUpDto;
-import saiga.payload.dto.UpdateUserDto;
+import saiga.payload.MyResponse;
+import saiga.payload.mapper.UserDtoMapper;
+import saiga.payload.request.SignUpRequest;
+import saiga.payload.request.UpdateUserRequest;
 import saiga.repository.RoleRepository;
 import saiga.repository.UserRepository;
-import saiga.security.JwtProvider;
 import saiga.security.CustomUserDetailsService;
+import saiga.security.JwtProvider;
 import saiga.service.UserService;
 import saiga.utils.exceptions.AlreadyExistsException;
 import saiga.utils.exceptions.NotFoundException;
 
-import static saiga.payload.dao.MyResponse._CREATED;
-import static saiga.payload.dao.MyResponse._UPDATED;
+import static saiga.payload.MyResponse._CREATED;
+import static saiga.payload.MyResponse._UPDATED;
 
 @Service
-public class UserServiceImpl implements UserService {
-    private final UserRepository repository;
-    private final CustomUserDetailsService userDetailsService;
-    private final JwtProvider jwtProvider;
-    private final RoleRepository roleRepository;
-
-    @Autowired
-    public UserServiceImpl(
-            UserRepository repository,
-            JwtProvider jwtProvider,
-            CustomUserDetailsService userDetailsService,
-            RoleRepository roleRepository
-    ) {
-        this.repository = repository;
-        this.userDetailsService = userDetailsService;
-        this.jwtProvider = jwtProvider;
-        this.roleRepository = roleRepository;
-    }
-
+public record UserServiceImpl(
+        UserRepository repository,
+        CustomUserDetailsService userDetailsService,
+        JwtProvider jwtProvider,
+        RoleRepository roleRepository,
+        UserDtoMapper userDtoMapper
+) implements UserService {
     @Override
     public MyResponse login(String phoneNumber) {
         final String token = jwtProvider.generateToken(phoneNumber);
@@ -45,49 +33,53 @@ public class UserServiceImpl implements UserService {
                 .setMessage("Login successfully")
                 .addData(
                         "user",
-                        repository.save(
+                        userDtoMapper.apply(repository.save(
                                 userDetailsService.loadUserByUsername(
                                         phoneNumber
                                 ).setToken(token)
-                        )
+                        ))
                 ).addData("token", token);
     }
 
     @Override
-    public MyResponse signUp(SignUpDto signUpDto) {
-        if (repository.existsByPhoneNumber(signUpDto.getPhoneNumber()))
-            throw new AlreadyExistsException("User with phone number " + signUpDto.getPhoneNumber() + " already exists");
-        final String token = jwtProvider.generateToken(signUpDto.getPhoneNumber());
+    public MyResponse signUp(SignUpRequest signUpRequest) {
+        if (repository.existsByPhoneNumber(signUpRequest.phoneNumber()))
+            throw new AlreadyExistsException("User with phone number " + signUpRequest.phoneNumber() + " already exists");
+        final String token = jwtProvider.generateToken(signUpRequest.phoneNumber());
         return _CREATED
-                .addData("data", repository.save(
-                        new User(
-                                signUpDto.getPhoneNumber(),
-                                roleRepository.findByRole(signUpDto.getRole()).orElse(
-                                        roleRepository.save(
-                                                new Role(
-                                                        signUpDto.getRole()
+                .addData("data", userDtoMapper().apply(
+                        repository.save(
+                                new User(
+                                        signUpRequest.firstName(),
+                                        signUpRequest.lastName(),
+                                        signUpRequest.phoneNumber(),
+                                        roleRepository.findByRole(signUpRequest.role()).orElse(
+                                                roleRepository.save(
+                                                        new Role(
+                                                                signUpRequest.role()
+                                                        )
                                                 )
-                                        )
-                                ),
-                                token
+                                        ),
+                                        token
+                                )
                         )
                 )).setMessage("Sign Up successfully")
                 .addData("token", token);
     }
 
     @Override
-    public MyResponse update(Long id, UpdateUserDto updateUserdto) {
-        if (repository.existsByPhoneNumberAndIdIsNot(updateUserdto.getPhoneNumber(), id))
-            throw new AlreadyExistsException("User with phone number " + updateUserdto.getPhoneNumber() + " already exists");
+    public MyResponse update(Long id, UpdateUserRequest updateUserRequest) {
+        if (repository.existsByPhoneNumberAndIdIsNot(updateUserRequest.phoneNumber(), id))
+            throw new AlreadyExistsException("User with phone number " + updateUserRequest.phoneNumber() + " already exists");
 
         final User user = repository.findById(id).orElseThrow(
                 () -> new NotFoundException("User with id " + id + " not found")
         );
 
-        user.updateWithDto(updateUserdto);
-        final String token = jwtProvider.generateToken(updateUserdto.getPhoneNumber());
+        user.updateWithDto(updateUserRequest);
+        final String token = jwtProvider.generateToken(updateUserRequest.phoneNumber());
         return _UPDATED
-                .addData("data", repository.save(user.setToken(token)))
+                .addData("data", userDtoMapper.apply(repository.save(user.setToken(token))))
                 .addData("token", token)
                 .setMessage("Updated successfully")
                 .addData("token", token);

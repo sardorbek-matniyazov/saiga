@@ -1,4 +1,4 @@
-package saiga.payload.dao;
+package saiga.payload;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;

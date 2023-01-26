@@ -14,10 +14,10 @@ import saiga.utils.exceptions.AlreadyExistsException;
 import saiga.utils.exceptions.NotFoundException;
 import saiga.utils.exceptions.TypesInError;
 
-import static saiga.payload.dao.MyResponse._ALREADY_EXISTS;
-import static saiga.payload.dao.MyResponse._BAD_REQUEST;
-import static saiga.payload.dao.MyResponse._ILLEGAL_TYPES;
-import static saiga.payload.dao.MyResponse._NOT_FOUND;
+import static saiga.payload.MyResponse._ALREADY_EXISTS;
+import static saiga.payload.MyResponse._BAD_REQUEST;
+import static saiga.payload.MyResponse._ILLEGAL_TYPES;
+import static saiga.payload.MyResponse._NOT_FOUND;
 
 @ControllerAdvice
 public class GlobalHandler extends ResponseEntityExceptionHandler {

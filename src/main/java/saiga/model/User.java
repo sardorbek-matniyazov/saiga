@@ -1,6 +1,5 @@
 package saiga.model;
 
-import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -9,7 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import saiga.model.enums.Lang;
 import saiga.model.enums.Status;
-import saiga.payload.dto.UpdateUserDto;
+import saiga.payload.request.UpdateUserRequest;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -20,8 +19,6 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 import static saiga.model.enums.Status.ACTIVE;
 import static saiga.utils.constants.ModelConstants._ENUM_LENGTH;
@@ -63,18 +60,21 @@ public class User
     private Role role;
 
     @Column(name = "user_status", length = _ENUM_LENGTH)
+    @Enumerated(EnumType.STRING)
     private Status status = ACTIVE;
+
+    public User(String firstName, String lastName, String phoneNumber, Role orElse, String token) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phoneNumber = phoneNumber;
+        this.role = orElse;
+        this.currentToken = token;
+    }
 
     // custom setters
     public User setToken(String token) {
         this.currentToken = token;
         return this;
-    }
-
-    public User(String phoneNumber, Role byRole, String currentToken) {
-        this.role = byRole;
-        this.phoneNumber = phoneNumber;
-        this.currentToken = currentToken;
     }
 
     @Override
@@ -112,22 +112,10 @@ public class User
         return status.equals(ACTIVE);
     }
 
-    @JsonValue
-    public Map<String, Object> toJson() {
-        Map<String, Object> mp = new HashMap<>();
-        mp.put("id", id);
-        mp.put("firstName", firstName);
-        mp.put("lastName", lastName);
-        mp.put("lang", lang);
-        mp.put("phoneNumber", phoneNumber);
-        mp.put("role", role);
-        return mp;
-    }
-
-    public void updateWithDto(UpdateUserDto dto) {
-        this.firstName = dto.getFirstname();
-        this.lastName = dto.getLastname();
-        this.lang = dto.getLang();
-        this.phoneNumber = dto.getPhoneNumber();
+    public void updateWithDto(UpdateUserRequest dto) {
+        this.firstName = dto.firstname();
+        this.lastName = dto.lastname();
+        this.lang = dto.lang();
+        this.phoneNumber = dto.phoneNumber();
     }
 }
