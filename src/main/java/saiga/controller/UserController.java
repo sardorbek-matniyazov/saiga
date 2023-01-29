@@ -15,20 +15,20 @@ import javax.validation.Valid;
 import java.util.Map;
 
 @RestController
-@RequestMapping(value = "/api/auth")
+@RequestMapping(value = "api/users")
 public record UserController(UserService service) {
-    @PostMapping(value = "/sign-in")
+    @PostMapping(value = "sign-in")
     public HttpEntity<?> signIn(@RequestBody @Valid Map<String, String> mp) {
         return service.signIn(mp.get("phoneNumber")).handleResponse();
     }
 
-    @PostMapping(value = "/sign-up")
-    public HttpEntity<?> signUp(@RequestBody @Valid SignUpRequest signUpDto) {
-        return service.signUp(signUpDto).handleResponse();
+    @PostMapping(value = "sign-up")
+    public HttpEntity<?> signUp(@RequestBody @Valid SignUpRequest signUpRequest) {
+        return service.signUp(signUpRequest).handleResponse();
     }
 
-    @PutMapping(value = "/{id}")
-    public HttpEntity<?> update(@RequestBody @Valid UpdateUserRequest updateUserDto, @PathVariable Long id) {
-        return service.update(id, updateUserDto).handleResponse();
+    @PutMapping(value = "{id}")
+    public HttpEntity<?> update(@RequestBody @Valid UpdateUserRequest updateUserRequest, @PathVariable Long id) {
+        return service.update(id, updateUserRequest).handleResponse();
     }
 }

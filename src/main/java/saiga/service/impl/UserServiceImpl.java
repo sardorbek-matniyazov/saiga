@@ -1,12 +1,14 @@
 package saiga.service.impl;
 
 import org.springframework.stereotype.Service;
+import saiga.model.Cabinet;
 import saiga.model.Role;
 import saiga.model.User;
 import saiga.payload.MyResponse;
-import saiga.payload.mapper.UserDtoMapper;
+import saiga.payload.mapper.UserDTOMapper;
 import saiga.payload.request.SignUpRequest;
 import saiga.payload.request.UpdateUserRequest;
+import saiga.repository.CabinetRepository;
 import saiga.repository.RoleRepository;
 import saiga.repository.UserRepository;
 import saiga.security.CustomUserDetailsService;
@@ -24,7 +26,8 @@ public record UserServiceImpl(
         CustomUserDetailsService userDetailsService,
         JwtProvider jwtProvider,
         RoleRepository roleRepository,
-        UserDtoMapper userDtoMapper
+        UserDTOMapper userDtoMapper,
+        CabinetRepository cabinetRepository
 ) implements UserService {
     @Override
     public MyResponse signIn(String phoneNumber) {
@@ -46,23 +49,26 @@ public record UserServiceImpl(
         if (repository.existsByPhoneNumber(signUpRequest.phoneNumber()))
             throw new AlreadyExistsException("User with phone number " + signUpRequest.phoneNumber() + " already exists");
         final String token = jwtProvider.generateToken(signUpRequest.phoneNumber());
+
         return _CREATED
                 .addData("data", userDtoMapper().apply(
-                        repository.save(
-                                new User(
-                                        signUpRequest.firstName(),
-                                        signUpRequest.lastName(),
-                                        signUpRequest.phoneNumber(),
-                                        roleRepository.findByRole(signUpRequest.role()).orElse(
-                                                roleRepository.save(
-                                                        new Role(
-                                                                signUpRequest.role()
+                        cabinetRepository.save(
+                                new Cabinet(
+                                        new User(
+                                                signUpRequest.firstName(),
+                                                signUpRequest.lastName(),
+                                                signUpRequest.phoneNumber(),
+                                                roleRepository.findByRole(signUpRequest.role()).orElse(
+                                                        roleRepository.save(
+                                                                new Role(
+                                                                        signUpRequest.role()
+                                                                )
                                                         )
-                                                )
-                                        ),
-                                        token
+                                                ),
+                                                token
+                                        )
                                 )
-                        )
+                        ).getUser()
                 )).setMessage("Sign Up successfully")
                 .addData("token", token);
     }

@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class OpenApiConfig {
+public class OpenApiConf {
     @Bean
     public OpenAPI customOpenAPI() {
         final String schemeName = "bearerAuth";

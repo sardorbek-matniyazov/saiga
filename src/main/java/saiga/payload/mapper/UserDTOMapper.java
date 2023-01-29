@@ -1,14 +1,13 @@
 package saiga.payload.mapper;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import saiga.model.User;
-import saiga.model.enums.Status;
 import saiga.payload.dto.UserDTO;
 
 import java.util.function.Function;
 
-@Component
-public class UserDtoMapper implements Function<User, UserDTO> {
+@Service
+public record UserDTOMapper() implements Function<User, UserDTO> {
     @Override
     public UserDTO apply(User user) {
         return new UserDTO(

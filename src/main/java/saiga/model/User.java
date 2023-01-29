@@ -21,11 +21,16 @@ import java.util.Collection;
 import java.util.Collections;
 
 import static saiga.model.enums.Status.ACTIVE;
-import static saiga.utils.constants.ModelConstants._ENUM_LENGTH;
-import static saiga.utils.constants.ModelConstants._NAME_LENGTH;
-import static saiga.utils.constants.ModelConstants._NUMBER_LENGTH;
-import static saiga.utils.constants.ModelConstants._TOKEN_LENGTH;
+import static saiga.utils.statics.ModelConstants._ENUM_LENGTH;
+import static saiga.utils.statics.ModelConstants._NAME_LENGTH;
+import static saiga.utils.statics.ModelConstants._NUMBER_LENGTH;
+import static saiga.utils.statics.ModelConstants._TOKEN_LENGTH;
 
+/**
+ * @author :  Sardor Matniyazov
+ * @mailto :  sardorbekmatniyazov03@gmail.com
+ * @created : 26 Jan 2023
+ **/
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor

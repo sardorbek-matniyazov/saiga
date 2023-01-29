@@ -19,13 +19,13 @@ import saiga.security.CustomUserDetailsService;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class SecurityConf extends WebSecurityConfigurerAdapter {
 
     private final CustomUserDetailsService myUserDetailsService;
     private final MyFilter myFilter;
 
     @Autowired
-    public SecurityConfiguration(CustomUserDetailsService myUserDetailsService, MyFilter myFilter) {
+    public SecurityConf(CustomUserDetailsService myUserDetailsService, MyFilter myFilter) {
         this.myUserDetailsService = myUserDetailsService;
         this.myFilter = myFilter;
     }
@@ -41,7 +41,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable().cors().disable()
                 .authorizeRequests()
-                .antMatchers("/api/auth/sign-in", "/api/auth/sign-up", "/stomp", "/socket", "/saiga-websocket/**", "/ws/**", "/").permitAll()
+                .antMatchers("/api/users/sign-in", "/api/users/sign-up", "/stomp", "/socket", "/saiga-websocket/**", "/ws/**", "/").permitAll()
                 .antMatchers(
                         "/v3/api-docs/**",
                         "/swagger-ui/**",

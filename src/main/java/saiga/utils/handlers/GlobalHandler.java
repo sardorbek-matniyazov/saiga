@@ -29,7 +29,7 @@ public class GlobalHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = {UsernameNotFoundException.class})
     public ResponseEntity<?> handleUsernameNotFound(UsernameNotFoundException e) {
-        return _ALREADY_EXISTS.setMessage(e.getMessage()).handleResponse();
+        return _NOT_FOUND.setMessage(e.getMessage()).handleResponse();
     }
 
     @ExceptionHandler(value = {NotFoundException.class})
