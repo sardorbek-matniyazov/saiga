@@ -2,6 +2,7 @@ package saiga.service;
 
 import saiga.payload.MyResponse;
 import saiga.payload.request.DriverOrderRequest;
+import saiga.payload.request.UserOrderRequest;
 
 /**
  * @author :  Sardor Matniyazov
@@ -10,4 +11,6 @@ import saiga.payload.request.DriverOrderRequest;
  **/
 public interface OrderService {
     MyResponse driversOrder(DriverOrderRequest driverOrderRequest);
+
+    MyResponse usersOrder(UserOrderRequest userOrderRequest);
 }

@@ -10,13 +10,13 @@ import java.lang.annotation.Target;
 /**
  * @author :  Sardor Matniyazov
  * @mailto :  sardorbekmatniyazov03@gmail.com
- * @created : 29 Jan 2023
+ * @created : 30 Jan 2023
  **/
 @Target(value = {ElementType.FIELD})
 @Retention(value = RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = DriverOrderDirectionHandler.class)
-public @interface CheckDriverDirectionIsValid {
-    String message() default "Direction's fromAddress and toAddress shouldn't be null";
+@Constraint(validatedBy = UserOrderDirectionHandler.class)
+public @interface CheckUserDirectionIsValid {
+    String message() default "Direction's fromAddress shouldn't be null";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

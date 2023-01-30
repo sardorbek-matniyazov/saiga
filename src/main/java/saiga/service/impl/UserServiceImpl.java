@@ -35,7 +35,7 @@ public record UserServiceImpl(
         return _CREATED
                 .setMessage("Login successfully")
                 .addData(
-                        "user",
+                        "data",
                         userDtoMapper.apply(repository.save(
                                 userDetailsService.loadUserByUsername(
                                         phoneNumber
@@ -87,7 +87,6 @@ public record UserServiceImpl(
         return _UPDATED
                 .addData("data", userDtoMapper.apply(repository.save(user.setToken(token))))
                 .addData("token", token)
-                .setMessage("Updated successfully")
-                .addData("token", token);
+                .setMessage("Updated successfully");
     }
 }

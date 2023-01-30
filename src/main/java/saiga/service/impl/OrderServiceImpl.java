@@ -6,12 +6,14 @@ import saiga.model.Cabinet;
 import saiga.model.Order;
 import saiga.model.User;
 import saiga.payload.MyResponse;
-import saiga.payload.mapper.DriverOrderDTOMapper;
+import saiga.payload.mapper.OrderDTOMapper;
 import saiga.payload.request.DriverOrderRequest;
+import saiga.payload.request.UserOrderRequest;
 import saiga.repository.CabinetRepository;
 import saiga.repository.OrderRepository;
 import saiga.service.OrderService;
 import saiga.utils.exceptions.NotFoundException;
+
 
 /**
  * @author :  Sardor Matniyazov
@@ -22,21 +24,16 @@ import saiga.utils.exceptions.NotFoundException;
 public record OrderServiceImpl (
         OrderRepository repository,
         CabinetRepository cabinetRepository,
-        DriverOrderDTOMapper driverOrderDTOMapper
+        OrderDTOMapper orderDTOMapper
 ) implements OrderService {
     @Override
     public MyResponse driversOrder(DriverOrderRequest driverOrderRequest) {
-        // get current authenticated user
-        final User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        final Cabinet cabinet = cabinetRepository.findByUserId(currentUser.getId()).orElseThrow(
-                () -> new NotFoundException("You haven't an access to create order !")
-        );
-
+        // get cabinet of current user
+        final Cabinet currentUsersCabinet = getCurrentUsersCabinet();
         // saving order
         final Order savedOrder = repository.save(
                 new Order(
-                        cabinet,
+                        currentUsersCabinet,
                         driverOrderRequest.direction(),
                         driverOrderRequest.amountOfMoney(),
                         driverOrderRequest.timeWhen(),
@@ -46,6 +43,35 @@ public record OrderServiceImpl (
 
         return MyResponse._CREATED
                 .setMessage("Order created successfully")
-                .addData("data", driverOrderDTOMapper.apply(savedOrder));
+                .addData("data", orderDTOMapper.apply(savedOrder));
     }
+
+    @Override
+    public MyResponse usersOrder(UserOrderRequest userOrderRequest) {
+        final Cabinet currentUsersCabinet = getCurrentUsersCabinet();
+
+        // users order are saving
+        final Order savedOrder = repository.save(
+                new Order(
+                        currentUsersCabinet,
+                        userOrderRequest.direction(),
+                        userOrderRequest.amountOfMoney(),
+                        userOrderRequest.comment()
+                )
+        );
+
+        return MyResponse._CREATED
+                .setMessage("Order created successfully")
+                .addData("data", orderDTOMapper.apply(savedOrder));
+    }
+
+    private Cabinet getCurrentUsersCabinet() {
+        // get current authenticated user
+        final User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        return cabinetRepository.findByUserId(currentUser.getId()).orElseThrow(
+                () -> new NotFoundException("You haven't an access to create order !")
+        );
+    }
+
 }

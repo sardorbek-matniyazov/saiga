@@ -10,9 +10,10 @@ import java.sql.Timestamp;
  * @mailto :  sardorbekmatniyazov03@gmail.com
  * @created : 29 Jan 2023
  **/
-public record DriverOrderDTO(
+public record OrderDTO(
         long id,
-        UserDTO from,
+        UserDTO fromUser,
+        UserDTO toUser,
         Direction direction,
         String comment,
         BigDecimal money,
