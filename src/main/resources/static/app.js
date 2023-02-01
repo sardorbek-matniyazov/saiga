@@ -11,38 +11,42 @@ function setConnected(connected) {
     $("#greetings").html("");
 }
 
+const userName = 'user' + Math.floor((Math.random() * 1000) + 1);
+const socket = io('http://localhost:9092/new-order', {
+    transports: ['polling', 'websocket']
+});
+
 function connect() {
-    const socket = new SockJS('/saiga-websocket');
-    stompClient = Stomp.client('ws://localhost:3000/saiga-websocket');
-
-
-    stompClient.connect({}, function (frame) {
-        setConnected(true);
-        console.log('Connected: ' + frame);
-        stompClient.subscribe('/socket/users', function (greeting) {
-            showGreeting(JSON.parse(greeting.body));
-        });
+    socket.on('connect', function () {
+        output('<span class="connect-msg">The client has connected with the server. Username: ' + userName + '</span>');
     });
-}
 
-function showGreeting(message) {
-    console.log(message);
-    for (let i = 0; i < message.length; i++) {
-        $("#greetings").append("<tr><td>" + message[i].phoneNumber + "</td></tr>");
-    }
+    socket.on('reconnect_attempt', (attempts) => {
+        console.log('Try to reconnect at ' + attempts + ' attempt(s).');
+    });
 }
 
 function disconnect() {
     if (stompClient !== null) {
-        stompClient.disconnect();
+        socket.on('disconnect', function () {
+            output('<span class="disconnect-msg">The client has disconnected!</span>');
+        });
     }
     setConnected(false);
     console.log("Disconnected");
 }
 
-function sendName() {
-    stompClient.send("/request/search", {}, JSON.stringify({'name': $("#name").val()}));
+function emitToServer() {
+    socket.on('new-order', function (data) {
+        console.log('Received message', data);
+        if (data.userName === "admin") {
+            output('<span style="color: darkred" class="username-msg">' + data.userName + ':</span> ' + data.message);
+        } else {
+            output('<span style="color: purple; border: red"  class="username-msg">' + data.userName + ':</span> ' + data.message);
+        }
+    });
 }
+
 
 $(function () {
     $("form").on('submit', function (e) {
@@ -55,7 +59,7 @@ $(function () {
         disconnect();
     });
     $("#send").click(function () {
-        sendName();
+        emitToServer();
     });
 });
 

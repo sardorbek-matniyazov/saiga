@@ -14,6 +14,6 @@ public class WebConf implements WebMvcConfigurer {
     @Override
     public void configurePathMatch(PathMatchConfigurer configurer) {
         WebMvcConfigurer.super.configurePathMatch(configurer);
-        //configurer.addPathPrefix("api", HandlerTypePredicate.forAnnotation(RestController.class));
+//        configurer.addPathPrefix("api", HandlerTypePredicate.forAnnotation(RestController.class));
     }
 }

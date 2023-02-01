@@ -1,5 +1,7 @@
 package saiga.service.impl;
 
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import saiga.model.Cabinet;
@@ -12,7 +14,10 @@ import saiga.payload.request.UserOrderRequest;
 import saiga.repository.CabinetRepository;
 import saiga.repository.OrderRepository;
 import saiga.service.OrderService;
+import saiga.socket.SocketModule;
 import saiga.utils.exceptions.NotFoundException;
+
+import java.util.List;
 
 
 /**
@@ -24,7 +29,8 @@ import saiga.utils.exceptions.NotFoundException;
 public record OrderServiceImpl (
         OrderRepository repository,
         CabinetRepository cabinetRepository,
-        OrderDTOMapper orderDTOMapper
+        OrderDTOMapper orderDTOMapper,
+        @Lazy SocketModule socketModule
 ) implements OrderService {
     @Override
     public MyResponse driversOrder(DriverOrderRequest driverOrderRequest) {
@@ -60,9 +66,16 @@ public record OrderServiceImpl (
                 )
         );
 
+        socketModule.sendMessageToUserByEmit(savedOrder);
+
         return MyResponse._CREATED
                 .setMessage("Order created successfully")
                 .addData("data", orderDTOMapper.apply(savedOrder));
+    }
+
+    @Override
+    public List<Order> getAllNotReceivedOrders() {
+        return repository.findAllByCabinetToIsNull(Sort.by(Sort.Direction.DESC, "id"));
     }
 
     private Cabinet getCurrentUsersCabinet() {

@@ -1,8 +1,11 @@
 package saiga.service;
 
+import saiga.model.Order;
 import saiga.payload.MyResponse;
 import saiga.payload.request.DriverOrderRequest;
 import saiga.payload.request.UserOrderRequest;
+
+import java.util.List;
 
 /**
  * @author :  Sardor Matniyazov
@@ -13,4 +16,6 @@ public interface OrderService {
     MyResponse driversOrder(DriverOrderRequest driverOrderRequest);
 
     MyResponse usersOrder(UserOrderRequest userOrderRequest);
+
+    List<Order> getAllNotReceivedOrders();
 }

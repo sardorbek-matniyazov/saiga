@@ -17,7 +17,7 @@ import javax.validation.Valid;
  * @created : 29 Jan 2023
  **/
 @RestController
-@RequestMapping(value = "orders")
+@RequestMapping(value = "api/orders")
 public record OrderController (
         OrderService service
 ) {
