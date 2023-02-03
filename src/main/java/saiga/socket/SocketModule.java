@@ -28,12 +28,11 @@ public class SocketModule {
     public SocketModule(SocketIOServer server, OrderService orderService, OrderDTOMapper orderDTOMapper) {
         this.orderService = orderService;
         this.orderDTOMapper = orderDTOMapper;
-        this.namespace = server.addNamespace("/chat");
+        this.namespace = server.addNamespace("/order");
         this.namespace.addConnectListener(onConnected());
         this.namespace.addDisconnectListener(onDisconnected());
         this.namespace.addEventListener("new-order", OrderDTO.class, onChatReceived());
     }
-
     private DataListener<OrderDTO> onChatReceived() {
         return (client, data, ackSender) -> {
             System.out.println(data);

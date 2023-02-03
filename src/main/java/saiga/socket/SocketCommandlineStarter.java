@@ -5,8 +5,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 @Component
-public record SocketCommandlineStarter
-        (
+public record SocketCommandlineStarter(
         SocketIOServer server
 ) implements CommandLineRunner {
     @Override
