@@ -13,8 +13,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import saiga.security.MyFilter;
 import saiga.security.CustomUserDetailsService;
+import saiga.security.MyFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -47,7 +47,13 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
                         "/swagger-ui/**",
                         "/swagger-ui.html").permitAll()
                 .antMatchers("/*.js", "/*.css", "/*.ico").permitAll()
-                .antMatchers("/resources/**", "/static/**", "/webjars/**").permitAll()
+                .antMatchers(
+                        "/resources/**",
+                        "/static/**", "/webjars/**",
+                        "/socket.io.js.map",
+                        "jquery-3.3.1.min.js",
+                        "moment-2.24.0.min.js")
+                .permitAll()
                 .anyRequest().authenticated();
         http.addFilterBefore(myFilter, UsernamePasswordAuthenticationFilter.class);
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);

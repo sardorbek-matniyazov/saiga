@@ -5,9 +5,12 @@
     <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="/main.css" rel="stylesheet">
     <script src="/webjars/jquery/jquery.min.js"></script>
-    <script src="/webjars/sockjs-client/sockjs.min.js"></script>
-    <script src="/webjars/stomp-websocket/stomp.min.js"></script>
-    <script src="/app.js"></script>
+    <script src="/static/socket.io-2.2.0.js"></script>
+    <script src="/static/moment-2.24.0.min.js"></script>
+    <script src="/static/jquery-3.3.1.min.js"></script>
+    <!--    <script src="/webjars/sockjs-client/sockjs.min.js"></script>-->
+    <!--    <script src="/webjars/stomp-websocket/stomp.min.js"></script>-->
+    <!--    <script src="/app.js"></script>-->
 </head>
 <body>
 <noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
@@ -49,5 +52,72 @@
         </div>
     </div>
 </div>
+<script>
+    const userName = 'user' + Math.floor((Math.random() * 1000) + 1);
+    const socket = io('http://localhost:5002/order', {
+        transports: ['polling', 'websocket']
+    });
+    socket.on('connect', function () {
+        output('<span class="connect-msg">The client has connected with the server. Username: ' + userName + '</span>');
+    });
+    socket.on('new-order', function (data) {
+        console.log('Received message', data);
+        if (data.userName === "admin") {
+            output('<span style="color: darkred" class="username-msg">' + data + ':</span> ' + data);
+        } else {
+            output('<span style="color: purple; border: red"  class="username-msg">' + data + ':</span> ' + data);
+        }
+    });
+    socket.on('disconnect', function () {
+        output('<span class="disconnect-msg">The client has disconnected!</span>');
+    });
+    socket.on('reconnect_attempt', (attempts) => {
+        console.log('Try to reconnect at ' + attempts + ' attempt(s).');
+    });
+
+    function sendDisconnect() {
+        socket.disconnect();
+    }
+
+    function sendConnect() {
+        socket.disconnect();
+    }
+
+    function sendMessage() {
+        const $msg = $('#msg');
+        const message = $msg.val();
+        $msg.val('');
+        const jsonObject = {userName: userName, message: message, actionTime: new Date()};
+        socket.emit('new-order', jsonObject);
+    }
+
+    function output(message) {
+        const currentTime = "<span class='time'>" + moment().format('HH:mm:ss.SSS') + "</span>";
+        const element = $("<tr>" + currentTime + " " + message + "</tr>");
+        $('#console').prepend(element);
+    }
+
+    $(document).keydown(function (e) {
+        if (e.keyCode === 13) {
+            $('#send').click();
+        }
+    });
+
+    $(function () {
+        $("form").on('submit', function (e) {
+            e.preventDefault();
+        });
+        $("#connect").click(function () {
+            sendConnect();
+        });
+        $("#disconnect").click(function () {
+            sendDisconnect();
+        });
+        $("#send").click(function () {
+            console.log("message is sending")
+            sendMessage();
+        });
+    });
+</script>
 </body>
 </html>
