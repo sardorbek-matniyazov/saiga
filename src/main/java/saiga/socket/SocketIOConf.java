@@ -16,7 +16,7 @@ public class SocketIOConf {
     @Bean
     public SocketIOServer socketIOServer () {
         final Configuration configuration = new Configuration();
-        configuration.setHostname("192.168.0.1");
+        configuration.setHostname("127.0.0.1");
         configuration.setPort(5002);
         return new SocketIOServer(configuration);
     }
