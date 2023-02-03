@@ -33,7 +33,9 @@ public class SocketModule {
     }
     private DataListener<OrderDTO> onChatReceived() {
         return (client, data, ackSender) -> {
-            System.out.println(data);
+            System.out.println(client.getSessionId());
+            System.out.println(client.getHandshakeData().getHttpHeaders());
+            //System.out.println(data);
             namespace.getAllClients().forEach(System.out::println);
             namespace.getBroadcastOperations().sendEvent(
                     "new-order",
@@ -46,7 +48,6 @@ public class SocketModule {
 
     private ConnectListener onConnected() {
         return client -> {
-            System.out.println(client.getSessionId());
             HandshakeData handshakeData = client.getHandshakeData();
             System.out.println(handshakeData.getUrl());
         };
