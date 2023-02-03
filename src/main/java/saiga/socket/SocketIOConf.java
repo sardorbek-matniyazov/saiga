@@ -17,7 +17,7 @@ public class SocketIOConf {
     public SocketIOServer socketIOServer () {
         final Configuration configuration = new Configuration();
         configuration.setHostname("localhost");
-        configuration.setPort(9092);
+        configuration.setPort(5002);
         return new SocketIOServer(configuration);
     }
 }

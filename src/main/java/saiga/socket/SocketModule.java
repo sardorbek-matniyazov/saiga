@@ -18,8 +18,6 @@ import java.util.stream.Collectors;
 
 @Component
 public class SocketModule {
-
-
     private final SocketIONamespace namespace;
     private final OrderService orderService;
     private final OrderDTOMapper orderDTOMapper;
