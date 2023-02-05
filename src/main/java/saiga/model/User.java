@@ -21,10 +21,10 @@ import java.util.Collection;
 import java.util.Collections;
 
 import static saiga.model.enums.Status.ACTIVE;
-import static saiga.utils.statics.ModelConstants._ENUM_LENGTH;
-import static saiga.utils.statics.ModelConstants._NAME_LENGTH;
-import static saiga.utils.statics.ModelConstants._NUMBER_LENGTH;
-import static saiga.utils.statics.ModelConstants._TOKEN_LENGTH;
+import static saiga.utils.statics.Constants._ENUM_LENGTH;
+import static saiga.utils.statics.Constants._NAME_LENGTH;
+import static saiga.utils.statics.Constants._NUMBER_LENGTH;
+import static saiga.utils.statics.Constants._TOKEN_LENGTH;
 
 /**
  * @author :  Sardor Matniyazov

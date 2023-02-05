@@ -1,6 +1,8 @@
 package saiga.utils.statics;
 
-public interface ModelConstants {
+import java.math.BigDecimal;
+
+public interface Constants {
     int _TITLE_LENGTH = 70;
     int _NAME_LENGTH = 50;
     int _ENUM_LENGTH = 20;
@@ -8,4 +10,5 @@ public interface ModelConstants {
     int _DESC_LENGTH = 20;
     int _COMMENT_LENGTH = 500;
     int _TOKEN_LENGTH = 200;
+    BigDecimal _PERCENT_ORDER_TAX = BigDecimal.valueOf(1000D);
 }

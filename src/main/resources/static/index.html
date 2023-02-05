@@ -5,9 +5,9 @@
     <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="/main.css" rel="stylesheet">
     <script src="/webjars/jquery/jquery.min.js"></script>
-    <script src="/static/socket.io-2.2.0.js"></script>
-    <script src="/static/moment-2.24.0.min.js"></script>
-    <script src="/static/jquery-3.3.1.min.js"></script>
+    <script src="/socket.io-2.2.0.js"></script>
+    <script src="/moment-2.24.0.min.js"></script>
+    <script src="/jquery-3.3.1.min.js"></script>
     <!--    <script src="/webjars/sockjs-client/sockjs.min.js"></script>-->
     <!--    <script src="/webjars/stomp-websocket/stomp.min.js"></script>-->
     <!--    <script src="/app.js"></script>-->
@@ -58,21 +58,17 @@
         transports: ['polling', 'websocket']
     });
     socket.on('connect', function () {
-        output('<span class="connect-msg">The client has connected with the server. Username: ' + userName + '</span>');
+        // output('<span class="connect-msg">The client has connected with the server. Username: ' + userName + '</span>');
     });
     socket.on('new-order', function (data) {
         console.log('Received message', data);
-        if (data.userName === "admin") {
-            output('<span style="color: darkred" class="username-msg">' + data + ':</span> ' + data);
-        } else {
-            output('<span style="color: purple; border: red"  class="username-msg">' + data + ':</span> ' + data);
-        }
+        output(data)
     });
     socket.on('disconnect', function () {
-        output('<span class="disconnect-msg">The client has disconnected!</span>');
+
     });
     socket.on('reconnect_attempt', (attempts) => {
-        console.log('Try to reconnect at ' + attempts + ' attempt(s).');
+        // console.log('Try to reconnect at ' + attempts + ' attempt(s).');
     });
 
     function sendDisconnect() {
@@ -91,10 +87,36 @@
         socket.emit('new-order', jsonObject);
     }
 
-    function output(message) {
-        const currentTime = "<span class='time'>" + moment().format('HH:mm:ss.SSS') + "</span>";
-        const element = $("<tr>" + currentTime + " " + message + "</tr>");
-        $('#console').prepend(element);
+    function output(body) {
+        console.log(typeof body)
+        // for(const b in obj){
+        //     let elem = '<tr> <span class=\'time\'>" + moment().format(\'HH:mm:ss.SSS\') + "</span>';
+        //     for(const bod in b) {
+        //         elem.concat('<td>' + b[bod] + '</td>');
+        //     }
+        //     $('#greetings').append(elem + '</tr>');
+        // }
+        let elem = '';
+        try {
+            for (const item of body) {
+                elem += `<tr><th>${item["id"]}</span></th><td>${item["money"]}</td><td>${item["timeWhen"]}</td>`
+                elem += "<td><table>";
+                elem += `<tr style="border-radius: 2px; border: dashed red;"><th style="margin-left: 5px">Firstname</th><td>${item["fromUser"]["firstName"]}</td></tr>`
+                elem += `<tr style="border-radius: 2px; border: dashed red;"><th style="margin-left: 5px">Lastname</th><td>${item["fromUser"]["lastName"]}</td></tr>`
+                elem += `<tr style="border-radius: 2px; border: dashed red;"><th style="margin-left: 5px">PhoneNumber</th><td>${item["fromUser"]["phoneNumber"]}</td></tr>`
+                elem += '</table>'
+                elem += '</td></tr>';
+            }
+        } catch (e) {
+            elem += `<tr><th>${body["id"]}</span></th><td>${body["money"]}</td><td>${body["timeWhen"]}</td>`
+            elem += "<td><table>";
+            elem += `<tr style="border-radius: 2px; border: dashed red;"><th style="margin-left: 5px">Firstname</th><td>${body["fromUser"]["firstName"]}</td></tr>`
+            elem += `<tr style="border-radius: 2px; border: dashed red;"><th style="margin-left: 5px">Lastname</th><td>${body["fromUser"]["lastName"]}</td></tr>`
+            elem += `<tr style="border-radius: 2px; border: dashed red;"><th style="margin-left: 5px">PhoneNumber</th><td>${body["fromUser"]["phoneNumber"]}</td></tr>`
+            elem += '</table>'
+            elem += '</td></tr>';
+        }
+        $('#greetings').append(elem);
     }
 
     $(document).keydown(function (e) {

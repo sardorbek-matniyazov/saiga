@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 import saiga.model.Cabinet;
 import saiga.model.Order;
 import saiga.model.User;
+import saiga.model.enums.OrderType;
 import saiga.payload.MyResponse;
+import saiga.payload.dto.OrderDTO;
 import saiga.payload.mapper.OrderDTOMapper;
 import saiga.payload.request.DriverOrderRequest;
 import saiga.payload.request.UserOrderRequest;
@@ -17,7 +19,13 @@ import saiga.service.OrderService;
 import saiga.socket.SocketModule;
 import saiga.utils.exceptions.NotFoundException;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static saiga.payload.MyResponse._BAD_REQUEST;
+import static saiga.payload.MyResponse._CREATED;
+import static saiga.utils.statics.Constants._PERCENT_ORDER_TAX;
 
 
 /**
@@ -47,7 +55,9 @@ public record OrderServiceImpl (
                 )
         );
 
-        return MyResponse._CREATED
+        socketModule.sendMessageToUserByEmit(savedOrder);
+
+        return _CREATED
                 .setMessage("Order created successfully")
                 .addData("data", orderDTOMapper.apply(savedOrder));
     }
@@ -68,14 +78,52 @@ public record OrderServiceImpl (
 
         socketModule.sendMessageToUserByEmit(savedOrder);
 
-        return MyResponse._CREATED
+        return _CREATED
                 .setMessage("Order created successfully")
                 .addData("data", orderDTOMapper.apply(savedOrder));
     }
 
     @Override
-    public List<Order> getAllNotReceivedOrders() {
-        return repository.findAllByCabinetToIsNull(Sort.by(Sort.Direction.DESC, "id"));
+    public List<OrderDTO> nonReceivedOrders(OrderType type) {
+        return repository.findAllByCabinetToIsNullAndType(Sort.by(Sort.Direction.DESC, "id"), type)
+                .stream()
+                .map(orderDTOMapper)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public MyResponse receiveOrderById(Long orderId) {
+        final Order order = repository.findById(orderId).orElseThrow(
+                () -> new NotFoundException("Order with id " + orderId + " not found")
+        );
+
+        if (order.getCabinetTo() != null)
+            return badRequestHandler("Order already received!");
+
+        final Cabinet currentUsersCabinet = getCurrentUsersCabinet();
+
+        if (currentUsersCabinet.equals(order.getCabinetFrom()))
+            return badRequestHandler("You can't receive your own order!");
+
+        if (currentUsersCabinet.getBalance().compareTo(_PERCENT_ORDER_TAX) <= 0)
+            return badRequestHandler("You don't have enough tax amount for receive this order, please top up your balance.");
+
+        // subtracting tax amount
+        currentUsersCabinet.setBalance(currentUsersCabinet.getBalance().subtract(_PERCENT_ORDER_TAX));
+
+        order.setCabinetTo(currentUsersCabinet);
+
+        return _CREATED
+                .setMessage("Order received successfully.")
+                .addData("data", orderDTOMapper.apply(repository.save(order)));
+    }
+
+    @Override
+    public List<OrderDTO> currentDriversHistoryOfOrder() {
+        return repository.findAllByCabinetTo_Id(getCurrentUsersCabinet().getId())
+                .stream()
+                .map(orderDTOMapper)
+                .collect(Collectors.toList());
     }
 
     private Cabinet getCurrentUsersCabinet() {
@@ -87,4 +135,7 @@ public record OrderServiceImpl (
         );
     }
 
+    private MyResponse badRequestHandler(String message) {
+        return _BAD_REQUEST.setMessage(message);
+    }
 }

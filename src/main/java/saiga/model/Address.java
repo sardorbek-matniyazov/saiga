@@ -9,7 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import static saiga.utils.statics.ModelConstants._TITLE_LENGTH;
+import static saiga.utils.statics.Constants._TITLE_LENGTH;
 
 @Data
 @NoArgsConstructor

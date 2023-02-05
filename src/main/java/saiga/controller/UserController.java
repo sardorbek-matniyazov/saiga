@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import saiga.payload.request.SignUpRequest;
+import saiga.payload.request.TopUpBalanceRequest;
 import saiga.payload.request.UpdateUserRequest;
 import saiga.service.UserService;
 
@@ -30,5 +31,10 @@ public record UserController(UserService service) {
     @PutMapping(value = "{id}")
     public HttpEntity<?> update(@RequestBody @Valid UpdateUserRequest updateUserRequest, @PathVariable Long id) {
         return service.update(id, updateUserRequest).handleResponse();
+    }
+
+    @PostMapping(value = "top-up-balance")
+    public HttpEntity<?> topUpBalance(@RequestBody @Valid TopUpBalanceRequest topUpBalanceRequest) {
+        return service.topUpBalance(topUpBalanceRequest).handleResponse();
     }
 }

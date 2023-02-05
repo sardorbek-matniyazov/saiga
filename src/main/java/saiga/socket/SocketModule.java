@@ -9,7 +9,7 @@ import com.corundumstudio.socketio.listener.DisconnectListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import saiga.model.Order;
-import saiga.payload.dto.OrderDTO;
+import saiga.model.enums.OrderType;
 import saiga.payload.mapper.OrderDTOMapper;
 import saiga.service.OrderService;
 
@@ -29,9 +29,9 @@ public class SocketModule {
         this.namespace = server.addNamespace("/order");
         this.namespace.addConnectListener(onConnected());
         this.namespace.addDisconnectListener(onDisconnected());
-        this.namespace.addEventListener("new-order", OrderDTO.class, onChatReceived());
+        this.namespace.addEventListener("new-order", saiga.payload.dto.OrderDTO.class, onChatReceived());
     }
-    private DataListener<OrderDTO> onChatReceived() {
+    private DataListener<saiga.payload.dto.OrderDTO> onChatReceived() {
         return (client, data, ackSender) -> {
             System.out.println(client.getSessionId());
             System.out.println(client.getHandshakeData().getHttpHeaders());
@@ -39,10 +39,8 @@ public class SocketModule {
             namespace.getAllClients().forEach(System.out::println);
             namespace.getBroadcastOperations().sendEvent(
                     "new-order",
-                    orderService.getAllNotReceivedOrders()
-                            .stream()
-                            .map(orderDTOMapper)
-                            .collect(Collectors.toList()));
+                    orderService.nonReceivedOrders(OrderType.FROM_USER)
+            );
         };
     }
 

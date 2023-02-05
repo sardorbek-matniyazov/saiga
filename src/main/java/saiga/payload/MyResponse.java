@@ -14,13 +14,13 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MyResponse {
-
     public static final MyResponse _CREATED = new MyResponse(HttpStatus.CREATED);
     public static final MyResponse _UPDATED = new MyResponse(HttpStatus.OK);
     public static final MyResponse _ALREADY_EXISTS = new MyResponse(HttpStatus.BAD_REQUEST);
     public static final MyResponse _BAD_REQUEST = new MyResponse(HttpStatus.BAD_REQUEST);
     public static final MyResponse _NOT_FOUND = new MyResponse(HttpStatus.BAD_REQUEST);
     public static final MyResponse _ILLEGAL_TYPES = new MyResponse(HttpStatus.BAD_REQUEST);
+    public static final MyResponse _OK = new MyResponse();
 
 
     private String message = "OK";
@@ -33,6 +33,7 @@ public class MyResponse {
         if (created.value() >= 400)
             this.active = false;
         this.code = created.value();
+        this.message = "Not Ok";
     }
 
     public MyResponse setMessage(String message) {

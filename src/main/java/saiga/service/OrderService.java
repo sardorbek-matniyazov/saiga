@@ -1,7 +1,8 @@
 package saiga.service;
 
-import saiga.model.Order;
+import saiga.model.enums.OrderType;
 import saiga.payload.MyResponse;
+import saiga.payload.dto.OrderDTO;
 import saiga.payload.request.DriverOrderRequest;
 import saiga.payload.request.UserOrderRequest;
 
@@ -17,5 +18,9 @@ public interface OrderService {
 
     MyResponse usersOrder(UserOrderRequest userOrderRequest);
 
-    List<Order> getAllNotReceivedOrders();
+    List<OrderDTO> nonReceivedOrders(OrderType orderType);
+
+    MyResponse receiveOrderById(Long orderId);
+
+    List<OrderDTO> currentDriversHistoryOfOrder();
 }

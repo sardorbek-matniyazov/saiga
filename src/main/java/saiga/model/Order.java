@@ -25,8 +25,8 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 import static saiga.utils.statics.GlobalMethodsToHelp.parseDdMMYyyyStringToDate;
-import static saiga.utils.statics.ModelConstants._COMMENT_LENGTH;
-import static saiga.utils.statics.ModelConstants._ENUM_LENGTH;
+import static saiga.utils.statics.Constants._COMMENT_LENGTH;
+import static saiga.utils.statics.Constants._ENUM_LENGTH;
 
 /**
  * @author :  Sardor Matniyazov
@@ -136,7 +136,7 @@ public class Order extends BaseCreatable {
         try {
             this.money = new BigDecimal(amountOfMoney);
         } catch (Exception e) {
-            throw new TypesInError("Date type is non parseable");
+            throw new TypesInError("Amount type is non parseable");
         }
 
         this.comment = comment;

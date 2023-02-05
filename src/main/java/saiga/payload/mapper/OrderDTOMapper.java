@@ -2,7 +2,6 @@ package saiga.payload.mapper;
 
 import org.springframework.stereotype.Service;
 import saiga.model.Order;
-import saiga.payload.dto.OrderDTO;
 
 import java.util.function.Function;
 
@@ -14,10 +13,10 @@ import java.util.function.Function;
 @Service
 public record OrderDTOMapper(
         UserDTOMapper userDTOMapper
-) implements Function<Order, OrderDTO> {
+) implements Function<Order, saiga.payload.dto.OrderDTO> {
     @Override
-    public OrderDTO apply(Order order) {
-        return new OrderDTO(
+    public saiga.payload.dto.OrderDTO apply(Order order) {
+        return new saiga.payload.dto.OrderDTO(
                 order.getId(),
                 userDTOMapper.apply(order.getCabinetFrom().getUser()),
                 order.getCabinetTo() != null ? userDTOMapper.apply(order.getCabinetTo().getUser()) : null,

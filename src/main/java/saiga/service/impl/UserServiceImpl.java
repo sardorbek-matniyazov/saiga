@@ -5,8 +5,10 @@ import saiga.model.Cabinet;
 import saiga.model.Role;
 import saiga.model.User;
 import saiga.payload.MyResponse;
+import saiga.payload.mapper.CabinetDTOMapper;
 import saiga.payload.mapper.UserDTOMapper;
 import saiga.payload.request.SignUpRequest;
+import saiga.payload.request.TopUpBalanceRequest;
 import saiga.payload.request.UpdateUserRequest;
 import saiga.repository.CabinetRepository;
 import saiga.repository.RoleRepository;
@@ -16,6 +18,9 @@ import saiga.security.JwtProvider;
 import saiga.service.UserService;
 import saiga.utils.exceptions.AlreadyExistsException;
 import saiga.utils.exceptions.NotFoundException;
+import saiga.utils.exceptions.TypesInError;
+
+import java.math.BigDecimal;
 
 import static saiga.payload.MyResponse._CREATED;
 import static saiga.payload.MyResponse._UPDATED;
@@ -27,7 +32,8 @@ public record UserServiceImpl(
         JwtProvider jwtProvider,
         RoleRepository roleRepository,
         UserDTOMapper userDtoMapper,
-        CabinetRepository cabinetRepository
+        CabinetRepository cabinetRepository,
+        CabinetDTOMapper cabinetDTOMapper
 ) implements UserService {
     @Override
     public MyResponse signIn(String phoneNumber) {
@@ -88,5 +94,22 @@ public record UserServiceImpl(
                 .addData("data", userDtoMapper.apply(repository.save(user.setToken(token))))
                 .addData("token", token)
                 .setMessage("Updated successfully");
+    }
+
+    @Override
+    public MyResponse topUpBalance(TopUpBalanceRequest topUpBalanceRequest) {
+        final Cabinet cabinet = cabinetRepository.findByUserId(topUpBalanceRequest.userID()).orElseThrow(
+                () -> new NotFoundException("User not fount with id " + topUpBalanceRequest.userID())
+        );
+
+        try {
+            cabinet.setBalance(cabinet.getBalance().add(new BigDecimal(topUpBalanceRequest.amount())));
+        } catch (Exception e) {
+            throw new TypesInError("Amount type is non parseable");
+        }
+
+        return _UPDATED
+                .setMessage("Transfer successfully")
+                .addData("data", cabinetDTOMapper.apply(cabinetRepository.save(cabinet)));
     }
 }

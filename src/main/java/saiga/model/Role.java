@@ -13,7 +13,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import static saiga.utils.statics.ModelConstants._ENUM_LENGTH;
+import static saiga.utils.statics.Constants._ENUM_LENGTH;
 
 @Data
 @NoArgsConstructor
