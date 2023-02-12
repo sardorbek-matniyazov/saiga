@@ -1,88 +1,49 @@
 'use strict';
 
-const connectionPage = document.querySelector('#connection');
-const ordersPage = document.querySelector('#orders-page');
-const connectionF = document.querySelector('#connectionF');
-const messageForm = document.querySelector('#messageForm');
-const messageInput = document.querySelector('#message');
-const messageArea = document.querySelector('#messageArea');
-const connectingElement = document.querySelector('.connecting');
+const tableBody = document.querySelector('#table-body');
 
-let stompClient = null;
 let username = null;
 
-const colors = [
-    '#2196F3', '#32c787', '#00BCD4', '#ff5652',
-    '#ffc107', '#ff85af', '#FF9800', '#39bbb0'
-];
+const socket = new SockJS('/ws');
+const stompClient  = Stomp.over(socket);
 
-function connect(event) {
-    connectionPage.classList.add('hidden');
-    ordersPage.classList.remove('hidden');
-
-    const socket = new SockJS('/ws');
-    stompClient = Stomp.over(socket);
-
-    stompClient.connect({}, onConnected, onError);
-    event.preventDefault();
-}
-
+stompClient.connect({}, onConnected, onError);
 
 function onConnected() {
     stompClient.subscribe('/topic/new-order-from-driver', onMessageReceived);
     stompClient.subscribe('/topic/new-order-from-user', onMessageReceived);
-
-    stompClient.send("/app/chat.addUser",
-        {},
-        JSON.stringify({sender: username, type: 'JOIN'})
-    )
-
-    connectingElement.classList.add('hidden');
 }
 
 
 function onError(error) {
-    connectingElement.textContent = 'Could not connect to WebSocket server. Please refresh this page to try again!';
-    connectingElement.style.color = 'red';
+    console.log('Could not connect to WebSocket server. Please refresh this page to try again!');
 }
 
 function onMessageReceived(payload) {
-    const message = JSON.parse(payload.body);
-    console.log(message);
+    const order = JSON.parse(payload.body);
+    console.log(order);
+    const messageElement = document.createElement('tr');
+    const orderId = document.createElement('td');
+    orderId.className = 'table-secondary';
+    const messageContent = document.createElement('td');
+    messageContent.className = 'table-info';
+    const messageSender = document.createElement('td');
+    messageSender.className = 'table-info';
+    const messageDate = document.createElement('td');
+    messageDate.className = 'table-info';
+    const messageStatus = document.createElement('td');
+    messageStatus.className = 'table-info';
 
-    let messageElement = document.createElement('li');
+    messageContent.textContent =    order.body.order.id;
+    messageSender.textContent  =    order.body.order.fromUser.firstName;
+    messageDate.textContent    =    order.body.order.timeWhen;
+    messageStatus.textContent  =    order.body.order;
 
-    const avatarElement = document.createElement('i');
-    const avatarText = document.createTextNode(message.sender[0]);
-    avatarElement.appendChild(avatarText);
-    avatarElement.style['background-color'] = '#2196F3';
+    messageContent.appendChild(orderId);
+    messageElement.appendChild(messageContent);
+    messageElement.appendChild(messageSender);
+    messageElement.appendChild(messageDate);
+    messageElement.appendChild(messageStatus);
 
-    messageElement.appendChild(avatarElement);
-
-    const usernameElement = document.createElement('span');
-    const usernameText = document.createTextNode(message.sender);
-    usernameElement.appendChild(usernameText);
-    messageElement.appendChild(usernameElement);
-
-    const textElement = document.createElement('p');
-    const messageText = document.createTextNode(message.message);
-    textElement.appendChild(messageText);
-
-    messageElement.appendChild(textElement);
-
-    messageArea.appendChild(messageElement);
-    messageArea.scrollTop = messageArea.scrollHeight;
+    tableBody.appendChild(messageElement);
 }
-
-
-function getAvatarColor(messageSender) {
-    var hash = 0;
-    for (var i = 0; i < messageSender.length; i++) {
-        hash = 31 * hash + messageSender.charCodeAt(i);
-    }
-
-    var index = Math.abs(hash % colors.length);
-    return colors[index];
-}
-
-connectionF.addEventListener('submit', connect, true)
