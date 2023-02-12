@@ -65,10 +65,8 @@ public record UserServiceImpl(
                                                 signUpRequest.lastName(),
                                                 signUpRequest.phoneNumber(),
                                                 roleRepository.findByRole(signUpRequest.role()).orElse(
-                                                        roleRepository.save(
-                                                                new Role(
-                                                                        signUpRequest.role()
-                                                                )
+                                                        new Role(
+                                                                signUpRequest.role()
                                                         )
                                                 ),
                                                 token

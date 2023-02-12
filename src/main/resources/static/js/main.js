@@ -1,8 +1,8 @@
 'use strict';
 
-const usernamePage = document.querySelector('#username-page');
-const chatPage = document.querySelector('#chat-page');
-const usernameForm = document.querySelector('#usernameForm');
+const connectionPage = document.querySelector('#connection');
+const ordersPage = document.querySelector('#orders-page');
+const connectionF = document.querySelector('#connectionF');
 const messageForm = document.querySelector('#messageForm');
 const messageInput = document.querySelector('#message');
 const messageArea = document.querySelector('#messageArea');
@@ -17,26 +17,21 @@ const colors = [
 ];
 
 function connect(event) {
-    username = document.querySelector('#name').value.trim();
+    connectionPage.classList.add('hidden');
+    ordersPage.classList.remove('hidden');
 
-    if(username) {
-        usernamePage.classList.add('hidden');
-        chatPage.classList.remove('hidden');
+    const socket = new SockJS('/ws');
+    stompClient = Stomp.over(socket);
 
-        const socket = new SockJS('/ws');
-        stompClient = Stomp.over(socket);
-
-        stompClient.connect({}, onConnected, onError);
-    }
+    stompClient.connect({}, onConnected, onError);
     event.preventDefault();
 }
 
 
 function onConnected() {
-    // Subscribe to the Public Topic
-    stompClient.subscribe('/topic/public', onMessageReceived);
+    stompClient.subscribe('/topic/new-order-from-driver', onMessageReceived);
+    stompClient.subscribe('/topic/new-order-from-user', onMessageReceived);
 
-    // Tell your username to the server
     stompClient.send("/app/chat.addUser",
         {},
         JSON.stringify({sender: username, type: 'JOIN'})
@@ -51,53 +46,26 @@ function onError(error) {
     connectingElement.style.color = 'red';
 }
 
-
-function sendMessage(event) {
-    var messageContent = messageInput.value.trim();
-
-    if(messageContent && stompClient) {
-        var chatMessage = {
-            sender: username,
-            content: messageInput.value,
-            type: 'CHAT'
-        };
-
-        stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(chatMessage));
-        messageInput.value = '';
-    }
-    event.preventDefault();
-}
-
-
 function onMessageReceived(payload) {
-    var message = JSON.parse(payload.body);
+    const message = JSON.parse(payload.body);
+    console.log(message);
 
-    var messageElement = document.createElement('li');
+    let messageElement = document.createElement('li');
 
-    if(message.type === 'JOIN') {
-        messageElement.classList.add('event-message');
-        message.content = message.sender + ' joined!';
-    } else if (message.type === 'LEAVE') {
-        messageElement.classList.add('event-message');
-        message.content = message.sender + ' left!';
-    } else {
-        messageElement.classList.add('chat-message');
+    const avatarElement = document.createElement('i');
+    const avatarText = document.createTextNode(message.sender[0]);
+    avatarElement.appendChild(avatarText);
+    avatarElement.style['background-color'] = '#2196F3';
 
-        var avatarElement = document.createElement('i');
-        var avatarText = document.createTextNode(message.sender[0]);
-        avatarElement.appendChild(avatarText);
-        avatarElement.style['background-color'] = getAvatarColor(message.sender);
+    messageElement.appendChild(avatarElement);
 
-        messageElement.appendChild(avatarElement);
+    const usernameElement = document.createElement('span');
+    const usernameText = document.createTextNode(message.sender);
+    usernameElement.appendChild(usernameText);
+    messageElement.appendChild(usernameElement);
 
-        var usernameElement = document.createElement('span');
-        var usernameText = document.createTextNode(message.sender);
-        usernameElement.appendChild(usernameText);
-        messageElement.appendChild(usernameElement);
-    }
-
-    var textElement = document.createElement('p');
-    var messageText = document.createTextNode(message.content);
+    const textElement = document.createElement('p');
+    const messageText = document.createTextNode(message.message);
     textElement.appendChild(messageText);
 
     messageElement.appendChild(textElement);
@@ -117,5 +85,4 @@ function getAvatarColor(messageSender) {
     return colors[index];
 }
 
-usernameForm.addEventListener('submit', connect, true)
-messageForm.addEventListener('submit', sendMessage, true)
+connectionF.addEventListener('submit', connect, true)

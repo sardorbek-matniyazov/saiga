@@ -10,13 +10,7 @@ import saiga.model.enums.Lang;
 import saiga.model.enums.Status;
 import saiga.payload.request.UpdateUserRequest;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -61,7 +55,7 @@ public class User
     @Column(name = "user_current_token", unique = true, length = _TOKEN_LENGTH)
     private String currentToken;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
     private Role role;
 
     @Column(name = "user_status", length = _ENUM_LENGTH)
