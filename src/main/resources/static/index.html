@@ -1,145 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Hello WebSocket</title>
-    <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/main.css" rel="stylesheet">
-    <script src="/webjars/jquery/jquery.min.js"></script>
-    <script src="/socket.io-2.2.0.js"></script>
-    <script src="/moment-2.24.0.min.js"></script>
-    <script src="/jquery-3.3.1.min.js"></script>
-    <!--    <script src="/webjars/sockjs-client/sockjs.min.js"></script>-->
-    <!--    <script src="/webjars/stomp-websocket/stomp.min.js"></script>-->
-    <!--    <script src="/app.js"></script>-->
-</head>
-<body>
-<noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
-    enabled. Please enable
-    Javascript and reload this page!</h2></noscript>
-<div id="main-content" class="container">
-    <div class="row">
-        <div class="col-md-6">
-            <form class="form-inline">
+<html>
+  <head>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+      <title>Spring Boot WebSocket Chat Application | CalliCoder</title>
+      <link rel="stylesheet" href="./css/main.css" />
+  </head>
+  <body>
+    <noscript>
+      <h2>Sorry! Your browser doesn't support Javascript</h2>
+    </noscript>
+
+    <div id="username-page">
+        <div class="username-page-container">
+            <h1 class="title">Type your username</h1>
+            <form id="usernameForm" name="usernameForm">
                 <div class="form-group">
-                    <label for="connect">WebSocket connection:</label>
-                    <button id="connect" class="btn btn-default" type="submit">Connect</button>
-                    <button id="disconnect" class="btn btn-default" type="submit" disabled="disabled">Disconnect
-                    </button>
+                    <input type="text" id="name" placeholder="Username" autocomplete="off" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="accent username-submit">Start Chatting</button>
                 </div>
             </form>
         </div>
-        <div class="col-md-6">
-            <form class="form-inline">
+    </div>
+
+    <div id="chat-page" class="hidden">
+        <div class="chat-container">
+            <div class="chat-header">
+                <h2>Spring WebSocket Chat Demo</h2>
+            </div>
+            <div class="connecting">
+                Connecting...
+            </div>
+            <ul id="messageArea">
+
+            </ul>
+            <form id="messageForm" name="messageForm" nameForm="messageForm">
                 <div class="form-group">
-                    <label for="name">What is your name?</label>
-                    <input type="text" id="name" class="form-control" placeholder="Your name here...">
+                    <div class="input-group clearfix">
+                        <input type="text" id="message" placeholder="Type a message..." autocomplete="off" class="form-control"/>
+                        <button type="submit" class="primary">Send</button>
+                    </div>
                 </div>
-                <button id="send" class="btn btn-default" type="submit">Send</button>
             </form>
         </div>
     </div>
-    <div class="row">
-        <div class="col-md-12">
-            <table id="conversation" class="table table-striped">
-                <thead>
-                <tr>
-                    <th>Greetings</th>
-                </tr>
-                </thead>
-                <tbody id="greetings">
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-<script>
-    const userName = 'user' + Math.floor((Math.random() * 1000) + 1);
-    const socket = io('http://localhost:5002/order', {
-        transports: ['polling', 'websocket']
-    });
-    socket.on('connect', function () {
-        // output('<span class="connect-msg">The client has connected with the server. Username: ' + userName + '</span>');
-    });
-    socket.on('new-order', function (data) {
-        console.log('Received message', data);
-        output(data)
-    });
-    socket.on('disconnect', function () {
 
-    });
-    socket.on('reconnect_attempt', (attempts) => {
-        // console.log('Try to reconnect at ' + attempts + ' attempt(s).');
-    });
-
-    function sendDisconnect() {
-        socket.disconnect();
-    }
-
-    function sendConnect() {
-        socket.disconnect();
-    }
-
-    function sendMessage() {
-        const $msg = $('#msg');
-        const message = $msg.val();
-        $msg.val('');
-        const jsonObject = {userName: userName, message: message, actionTime: new Date()};
-        socket.emit('new-order', jsonObject);
-    }
-
-    function output(body) {
-        console.log(typeof body)
-        // for(const b in obj){
-        //     let elem = '<tr> <span class=\'time\'>" + moment().format(\'HH:mm:ss.SSS\') + "</span>';
-        //     for(const bod in b) {
-        //         elem.concat('<td>' + b[bod] + '</td>');
-        //     }
-        //     $('#greetings').append(elem + '</tr>');
-        // }
-        let elem = '';
-        try {
-            for (const item of body) {
-                elem += `<tr><th>${item["id"]}</span></th><td>${item["money"]}</td><td>${item["timeWhen"]}</td>`
-                elem += "<td><table>";
-                elem += `<tr style="border-radius: 2px; border: dashed red;"><th style="margin-left: 5px">Firstname</th><td>${item["fromUser"]["firstName"]}</td></tr>`
-                elem += `<tr style="border-radius: 2px; border: dashed red;"><th style="margin-left: 5px">Lastname</th><td>${item["fromUser"]["lastName"]}</td></tr>`
-                elem += `<tr style="border-radius: 2px; border: dashed red;"><th style="margin-left: 5px">PhoneNumber</th><td>${item["fromUser"]["phoneNumber"]}</td></tr>`
-                elem += '</table>'
-                elem += '</td></tr>';
-            }
-        } catch (e) {
-            elem += `<tr><th>${body["id"]}</span></th><td>${body["money"]}</td><td>${body["timeWhen"]}</td>`
-            elem += "<td><table>";
-            elem += `<tr style="border-radius: 2px; border: dashed red;"><th style="margin-left: 5px">Firstname</th><td>${body["fromUser"]["firstName"]}</td></tr>`
-            elem += `<tr style="border-radius: 2px; border: dashed red;"><th style="margin-left: 5px">Lastname</th><td>${body["fromUser"]["lastName"]}</td></tr>`
-            elem += `<tr style="border-radius: 2px; border: dashed red;"><th style="margin-left: 5px">PhoneNumber</th><td>${body["fromUser"]["phoneNumber"]}</td></tr>`
-            elem += '</table>'
-            elem += '</td></tr>';
-        }
-        $('#greetings').append(elem);
-    }
-
-    $(document).keydown(function (e) {
-        if (e.keyCode === 13) {
-            $('#send').click();
-        }
-    });
-
-    $(function () {
-        $("form").on('submit', function (e) {
-            e.preventDefault();
-        });
-        $("#connect").click(function () {
-            sendConnect();
-        });
-        $("#disconnect").click(function () {
-            sendDisconnect();
-        });
-        $("#send").click(function () {
-            console.log("message is sending")
-            sendMessage();
-        });
-    });
-</script>
-</body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="./js/main.js"></script>
+  </body>
 </html>

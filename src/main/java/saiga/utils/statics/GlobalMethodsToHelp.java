@@ -1,5 +1,7 @@
 package saiga.utils.statics;
 
+import org.springframework.security.core.context.SecurityContextHolder;
+import saiga.model.User;
 import saiga.utils.exceptions.TypesInError;
 
 import java.sql.Timestamp;
@@ -20,5 +22,9 @@ public class GlobalMethodsToHelp {
             throw new TypesInError("non parseable date format");
         }
         return parse;
+    }
+
+    public static User getCurrentUser() {
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }

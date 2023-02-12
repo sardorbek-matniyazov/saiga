@@ -1,6 +1,5 @@
 package saiga.service.impl;
 
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -16,10 +15,9 @@ import saiga.payload.request.UserOrderRequest;
 import saiga.repository.CabinetRepository;
 import saiga.repository.OrderRepository;
 import saiga.service.OrderService;
-import saiga.socket.SocketModule;
+import saiga.service.OrderSocketService;
 import saiga.utils.exceptions.NotFoundException;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,7 +36,7 @@ public record OrderServiceImpl (
         OrderRepository repository,
         CabinetRepository cabinetRepository,
         OrderDTOMapper orderDTOMapper,
-        @Lazy SocketModule socketModule
+        OrderSocketService orderSocketService
 ) implements OrderService {
     @Override
     public MyResponse driversOrder(DriverOrderRequest driverOrderRequest) {
@@ -55,7 +53,8 @@ public record OrderServiceImpl (
                 )
         );
 
-        socketModule.sendMessageToUserByEmit(savedOrder);
+        // emitting to socket client
+        orderSocketService.sendOrderToClient(savedOrder, OrderType.FROM_USER);
 
         return _CREATED
                 .setMessage("Order created successfully")
@@ -76,7 +75,8 @@ public record OrderServiceImpl (
                 )
         );
 
-        socketModule.sendMessageToUserByEmit(savedOrder);
+        // emitting to socket client
+        orderSocketService.sendOrderToClient(savedOrder, OrderType.FROM_USER);
 
         return _CREATED
                 .setMessage("Order created successfully")
@@ -112,6 +112,12 @@ public record OrderServiceImpl (
         currentUsersCabinet.setBalance(currentUsersCabinet.getBalance().subtract(_PERCENT_ORDER_TAX));
 
         order.setCabinetTo(currentUsersCabinet);
+
+        // emitting to socket client
+        switch (order.getType()) {
+            case FROM_USER -> orderSocketService.sendOrderToClient(order, OrderType.FROM_USER);
+            case FROM_DRIVER -> orderSocketService.sendOrderToClient(order, OrderType.FROM_DRIVER);
+        }
 
         return _CREATED
                 .setMessage("Order received successfully.")

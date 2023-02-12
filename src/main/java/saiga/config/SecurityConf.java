@@ -41,19 +41,24 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable().cors().disable()
                 .authorizeRequests()
-                .antMatchers("/api/users/sign-in", "/api/users/sign-up", "/stomp", "/socket", "/saiga-websocket/**", "/ws/**", "/").permitAll()
+                .antMatchers(
+                        "/api/users/sign-in",
+                        "/api/users/sign-up",
+                        "/stomp", "/socket",
+                        "/saiga-websocket/**",
+                        "/ws/**", "/", "/demo/**"
+                ).permitAll()
                 .antMatchers(
                         "/v3/api-docs/**",
                         "/swagger-ui/**",
                         "/swagger-ui.html").permitAll()
-                .antMatchers("/*.js", "/*.css", "/*.ico").permitAll()
+                .antMatchers("/js/**", "/css/**", "/*.ico").permitAll()
                 .antMatchers(
                         "/resources/**",
                         "/static/**", "/webjars/**",
                         "/socket.io.js.map",
                         "jquery-3.3.1.min.js",
-                        "moment-2.24.0.min.js")
-                .permitAll()
+                        "moment-2.24.0.min.js").permitAll()
                 .anyRequest().authenticated();
         http.addFilterBefore(myFilter, UsernamePasswordAuthenticationFilter.class);
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
