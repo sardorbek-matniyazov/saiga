@@ -1,15 +1,11 @@
 package saiga.controller;
 
 import org.springframework.http.HttpEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import saiga.model.enums.OrderType;
 import saiga.payload.MyResponse;
 import saiga.payload.request.DriverOrderRequest;
+import saiga.payload.request.OrderEndRequest;
 import saiga.payload.request.UserOrderRequest;
 import saiga.service.OrderService;
 
@@ -53,5 +49,15 @@ public record OrderController (
     @GetMapping(value = "history")
     public HttpEntity<?> currentDriversHistoryOfOrder() {
         return MyResponse._OK.addData("data", service.currentDriversHistoryOfOrder()).handleResponse();
+    }
+
+    @PutMapping(value = "end-order")
+    public HttpEntity<?> endOrderById(@RequestBody @Valid OrderEndRequest endRequest) {
+        return service.endOrderById(endRequest).handleResponse();
+    }
+
+    @PutMapping(value = "cancel-order/{id}")
+    public HttpEntity<?> cancelOwnOrder(@PathVariable Long id) {
+        return service.cancelOwnOrderByOrderId(id).handleResponse();
     }
 }

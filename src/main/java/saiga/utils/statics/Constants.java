@@ -11,4 +11,5 @@ public interface Constants {
     int _COMMENT_LENGTH = 500;
     int _TOKEN_LENGTH = 200;
     BigDecimal _PERCENT_ORDER_TAX = BigDecimal.valueOf(1000D);
+    String _ONLY_DIGITS_REGEX = "[0-9]+";
 }

@@ -4,10 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import saiga.model.enums.OrderStatus;
 import saiga.model.enums.OrderType;
 import saiga.model.enums.RoleEnum;
 import saiga.payload.request.DirectionRequest;
-import saiga.utils.exceptions.TypesInError;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -24,9 +24,10 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-import static saiga.utils.statics.GlobalMethodsToHelp.parseDdMMYyyyStringToDate;
 import static saiga.utils.statics.Constants._COMMENT_LENGTH;
 import static saiga.utils.statics.Constants._ENUM_LENGTH;
+import static saiga.utils.statics.GlobalMethodsToHelp.parseStringMoneyToBigDecimalValue;
+import static saiga.utils.statics.GlobalMethodsToHelp.parseDdMMYyyyStringToDate;
 
 /**
  * @author :  Sardor Matniyazov
@@ -76,6 +77,13 @@ public class Order extends BaseCreatable {
     @Column(name = "time_when")
     private Timestamp timeWhen;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "order_status")
+    private OrderStatus status;
+
+    @Column(name = "length_of_way")
+    private Double lengthOfWay;
+
     public Order(
             Cabinet cabinetFrom,
             DirectionRequest direction,
@@ -122,7 +130,7 @@ public class Order extends BaseCreatable {
                         direction.addressFrom().lat(),
                         direction.addressFrom().lon()
                 ),
-                direction.addressTo() == null
+                direction.addressTo().lat() == 0
                         ? null
                         : new Address(
                         direction.addressTo().title(),
@@ -133,12 +141,10 @@ public class Order extends BaseCreatable {
 
         this.type = cabinetFromR.getUser().getRole().getRole() == RoleEnum.DRIVER ? OrderType.FROM_DRIVER : OrderType.FROM_USER;
 
-        try {
-            this.money = new BigDecimal(amountOfMoney);
-        } catch (Exception e) {
-            throw new TypesInError("Amount type is non parseable");
-        }
+        this.money = parseStringMoneyToBigDecimalValue(amountOfMoney);
 
         this.comment = comment;
+
+        this.status = OrderStatus.ACTIVE;
     }
 }

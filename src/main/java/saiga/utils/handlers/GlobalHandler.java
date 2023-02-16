@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import saiga.utils.exceptions.AlreadyExistsException;
+import saiga.utils.exceptions.BadRequestException;
 import saiga.utils.exceptions.NotFoundException;
 import saiga.utils.exceptions.TypesInError;
 
@@ -35,6 +36,11 @@ public class GlobalHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = {NotFoundException.class})
     public ResponseEntity<?> handleNotFound(NotFoundException e) {
         return _NOT_FOUND.setMessage(e.getMessage()).handleResponse();
+    }
+
+    @ExceptionHandler(value = {BadRequestException.class})
+    public ResponseEntity<?> handleBadRequest(NotFoundException e) {
+        return _BAD_REQUEST.setMessage(e.getMessage()).handleResponse();
     }
 
     @ExceptionHandler(value = {TypesInError.class})

@@ -4,9 +4,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import saiga.model.User;
 import saiga.utils.exceptions.TypesInError;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+
+import static saiga.utils.statics.Constants._ONLY_DIGITS_REGEX;
 
 /**
  * @author :  Sardor Matniyazov
@@ -26,5 +29,13 @@ public class GlobalMethodsToHelp {
 
     public static User getCurrentUser() {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
+    public static BigDecimal parseStringMoneyToBigDecimalValue(String s) {
+        if (s.matches(_ONLY_DIGITS_REGEX))
+            return new BigDecimal(s);
+        else
+            throw new TypesInError("Amount type is non parseable");
+
     }
 }

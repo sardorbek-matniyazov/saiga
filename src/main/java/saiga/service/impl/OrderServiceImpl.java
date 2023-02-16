@@ -6,23 +6,26 @@ import org.springframework.stereotype.Service;
 import saiga.model.Cabinet;
 import saiga.model.Order;
 import saiga.model.User;
+import saiga.model.enums.OrderStatus;
 import saiga.model.enums.OrderType;
 import saiga.payload.MyResponse;
 import saiga.payload.dto.OrderDTO;
 import saiga.payload.mapper.OrderDTOMapper;
 import saiga.payload.request.DriverOrderRequest;
+import saiga.payload.request.OrderEndRequest;
 import saiga.payload.request.UserOrderRequest;
 import saiga.repository.CabinetRepository;
 import saiga.repository.OrderRepository;
 import saiga.service.OrderService;
 import saiga.service.OrderSocketService;
+import saiga.utils.exceptions.BadRequestException;
 import saiga.utils.exceptions.NotFoundException;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static saiga.payload.MyResponse._BAD_REQUEST;
-import static saiga.payload.MyResponse._CREATED;
+import static saiga.payload.MyResponse.*;
 import static saiga.utils.statics.Constants._PERCENT_ORDER_TAX;
 
 
@@ -32,7 +35,7 @@ import static saiga.utils.statics.Constants._PERCENT_ORDER_TAX;
  * @created : 29 Jan 2023
  **/
 @Service
-public record OrderServiceImpl (
+public record OrderServiceImpl(
         OrderRepository repository,
         CabinetRepository cabinetRepository,
         OrderDTOMapper orderDTOMapper,
@@ -42,8 +45,9 @@ public record OrderServiceImpl (
     public MyResponse driversOrder(DriverOrderRequest driverOrderRequest) {
         // get cabinet of current user
         final Cabinet currentUsersCabinet = getCurrentUsersCabinet();
+
         // saving order
-        final Order savedOrder = repository.save(
+        final Order savedOrder = saveOrderToDatabase(
                 new Order(
                         currentUsersCabinet,
                         driverOrderRequest.direction(),
@@ -54,7 +58,7 @@ public record OrderServiceImpl (
         );
 
         // emitting to socket client
-        orderSocketService.sendOrderToClient(savedOrder, OrderType.FROM_USER);
+        emitNewOrderToSocket(savedOrder);
 
         return _CREATED
                 .setMessage("Order created successfully")
@@ -66,7 +70,7 @@ public record OrderServiceImpl (
         final Cabinet currentUsersCabinet = getCurrentUsersCabinet();
 
         // users order are saving
-        final Order savedOrder = repository.save(
+        final Order savedOrder = saveOrderToDatabase(
                 new Order(
                         currentUsersCabinet,
                         userOrderRequest.direction(),
@@ -76,7 +80,7 @@ public record OrderServiceImpl (
         );
 
         // emitting to socket client
-        orderSocketService.sendOrderToClient(savedOrder, OrderType.FROM_USER);
+        emitNewOrderToSocket(savedOrder);
 
         return _CREATED
                 .setMessage("Order created successfully")
@@ -93,35 +97,32 @@ public record OrderServiceImpl (
 
     @Override
     public MyResponse receiveOrderById(Long orderId) {
-        final Order order = repository.findById(orderId).orElseThrow(
-                () -> new NotFoundException("Order with id " + orderId + " not found")
-        );
+        Order order = getOrderById(orderId);
 
         if (order.getCabinetTo() != null)
-            return badRequestHandler("Order already received!");
+            throw new BadRequestException("Order already received!");
 
         final Cabinet currentUsersCabinet = getCurrentUsersCabinet();
 
         if (currentUsersCabinet.equals(order.getCabinetFrom()))
-            return badRequestHandler("You can't receive your own order!");
+            throw new BadRequestException("You can't receive your own order!");
 
-        if (currentUsersCabinet.getBalance().compareTo(_PERCENT_ORDER_TAX) <= 0)
-            return badRequestHandler("You don't have enough tax amount for receive this order, please top up your balance.");
+        // change balance of user
+        changeUsersBalanceByTax(currentUsersCabinet, '-');
 
-        // subtracting tax amount
-        currentUsersCabinet.setBalance(currentUsersCabinet.getBalance().subtract(_PERCENT_ORDER_TAX));
+        // reset status of order
+        order.setStatus(OrderStatus.RECEIVED);
 
         order.setCabinetTo(currentUsersCabinet);
 
-        // emitting to socket client
-        switch (order.getType()) {
-            case FROM_USER -> orderSocketService.sendOrderToClient(order, OrderType.FROM_USER);
-            case FROM_DRIVER -> orderSocketService.sendOrderToClient(order, OrderType.FROM_DRIVER);
-        }
+        order = saveOrderToDatabase(order);
+
+        // emit received order to socket client
+        emitReceiverOrderToSocket(order);
 
         return _CREATED
                 .setMessage("Order received successfully.")
-                .addData("data", orderDTOMapper.apply(repository.save(order)));
+                .addData("data", orderDTOMapper.apply(order));
     }
 
     @Override
@@ -130,6 +131,50 @@ public record OrderServiceImpl (
                 .stream()
                 .map(orderDTOMapper)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public MyResponse endOrderById(OrderEndRequest orderEndRequest) {
+        final Order order = getOrderById(orderEndRequest.orderId());
+
+        // money of clients screen
+        order.setMoney(BigDecimal.valueOf(orderEndRequest.orderMoney()));
+
+        // set length of the taken way
+        order.setLengthOfWay(orderEndRequest.OrderLengthOfWay());
+
+        // update status of order
+        order.setStatus(OrderStatus.ORDERED);
+
+        saveOrderToDatabase(order);
+
+        return _UPDATED.setMessage("Order Successfully ended");
+    }
+
+    @Override
+    public MyResponse cancelOwnOrderByOrderId(Long id) {
+        Order order = getOrderById(id);
+        final Cabinet currentUsersCabinet = getCurrentUsersCabinet();
+
+        if (currentUsersCabinet.getId().equals(order.getCabinetTo().getId()))
+            throw new BadRequestException("You only can cancel your own received order");
+
+        // reset status of canceled order
+        order.setStatus(OrderStatus.ACTIVE);
+
+        // change users balance
+        changeUsersBalanceByTax(currentUsersCabinet, '+');
+
+        // change order toUser to null
+        order.setCabinetTo(null);
+
+        // save changed order to database
+        saveOrderToDatabase(order);
+
+        // emit canceled order to socket
+        emitNewOrderToSocket(order);
+
+        return _UPDATED.setMessage("Order Canceled successfully");
     }
 
     private Cabinet getCurrentUsersCabinet() {
@@ -141,7 +186,36 @@ public record OrderServiceImpl (
         );
     }
 
-    private MyResponse badRequestHandler(String message) {
-        return _BAD_REQUEST.setMessage(message);
+    private Order getOrderById(Long id) {
+        return repository.findById(id).orElseThrow(
+                () -> new NotFoundException("Order not found with id " + id)
+        );
+    }
+
+    private Order saveOrderToDatabase(Order order) {
+        return repository.save(order);
+    }
+
+    private void changeUsersBalanceByTax(Cabinet cabinet, char expressionMethod) {
+        switch (expressionMethod) {
+            case '-' -> {
+                if (cabinet.getBalance().compareTo(_PERCENT_ORDER_TAX) <= 0)
+                    throw new BadRequestException("You don't have enough tax amount for receive this order, please top up your balance.");
+
+                // subtracting tax amount
+                cabinet.setBalance(cabinet.getBalance().subtract(_PERCENT_ORDER_TAX));
+            }
+            case '+' ->
+                // change current users balance
+                    cabinet.setBalance(cabinet.getBalance().subtract(_PERCENT_ORDER_TAX));
+        }
+    }
+
+    private void emitNewOrderToSocket(Order order) {
+        orderSocketService.sendOrderToClient(order, order.getType());
+    }
+
+    private void emitReceiverOrderToSocket(Order order) {
+        orderSocketService.sendReceivedOrderToClient(order, order.getType());
     }
 }

@@ -24,6 +24,7 @@ import java.math.BigDecimal;
 
 import static saiga.payload.MyResponse._CREATED;
 import static saiga.payload.MyResponse._UPDATED;
+import static saiga.utils.statics.GlobalMethodsToHelp.parseStringMoneyToBigDecimalValue;
 
 @Service
 public record UserServiceImpl(
@@ -100,11 +101,7 @@ public record UserServiceImpl(
                 () -> new NotFoundException("User not fount with id " + topUpBalanceRequest.userID())
         );
 
-        try {
-            cabinet.setBalance(cabinet.getBalance().add(new BigDecimal(topUpBalanceRequest.amount())));
-        } catch (Exception e) {
-            throw new TypesInError("Amount type is non parseable");
-        }
+        cabinet.setBalance(cabinet.getBalance().add(parseStringMoneyToBigDecimalValue(topUpBalanceRequest.amount())));
 
         return _UPDATED
                 .setMessage("Transfer successfully")
