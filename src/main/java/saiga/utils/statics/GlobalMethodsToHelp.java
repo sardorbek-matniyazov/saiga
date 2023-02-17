@@ -32,10 +32,10 @@ public class GlobalMethodsToHelp {
     }
 
     public static BigDecimal parseStringMoneyToBigDecimalValue(String s) {
-        if (s.matches(_ONLY_DIGITS_REGEX))
+        try {
             return new BigDecimal(s);
-        else
+        } catch (NumberFormatException e) {
             throw new TypesInError("Amount type is non parseable");
-
+        }
     }
 }

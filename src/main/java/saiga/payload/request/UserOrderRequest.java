@@ -2,7 +2,6 @@ package saiga.payload.request;
 
 import saiga.utils.validations.CheckUserDirectionIsValid;
 
-
 /**
  * @author :  Sardor Matniyazov
  * @mailto :  sardorbekmatniyazov03@gmail.com
