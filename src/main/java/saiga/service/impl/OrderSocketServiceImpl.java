@@ -39,17 +39,17 @@ public record OrderSocketServiceImpl(
 
     @Override
     public void sendReceivedOrderToClient(Order order, OrderType orderType) {
-        MyResponse._UPDATED
+        final MyResponse myResponse = MyResponse._UPDATED
                 .setMessage("Order received")
                 .addData("order", orderDTOMapper.apply(order));
         switch (orderType) {
             case FROM_DRIVER -> messagingTemplate.convertAndSend(
                     "/topic/received-order-from-driver",
-                    order
+                    myResponse
             );
             case FROM_USER -> messagingTemplate.convertAndSend(
                     "/topic/received-order-from-user",
-                    order
+                    myResponse
             );
         }
     }

@@ -39,7 +39,7 @@ public class GlobalHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(value = {BadRequestException.class})
-    public ResponseEntity<?> handleBadRequest(NotFoundException e) {
+    public ResponseEntity<?> handleBadRequest(BadRequestException e) {
         return _BAD_REQUEST.setMessage(e.getMessage()).handleResponse();
     }
 

@@ -199,7 +199,7 @@ public record OrderServiceImpl(
     private void changeUsersBalanceByTax(Cabinet cabinet, char expressionMethod) {
         switch (expressionMethod) {
             case '-' -> {
-                if (cabinet.getBalance().compareTo(_PERCENT_ORDER_TAX) <= 0)
+                if (cabinet.getBalance().compareTo(_PERCENT_ORDER_TAX) < 0)
                     throw new BadRequestException("You don't have enough tax amount for receive this order, please top up your balance.");
 
                 // subtracting tax amount
