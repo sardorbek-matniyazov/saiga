@@ -1,7 +1,13 @@
 package saiga.controller;
 
 import org.springframework.http.HttpEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import saiga.model.enums.OrderType;
 import saiga.payload.MyResponse;
 import saiga.payload.request.DriverOrderRequest;
@@ -33,12 +39,12 @@ public record OrderController (
 
     @GetMapping(value = "non-received/driver")
     public HttpEntity<?> nonReceivedOrdersDriver() {
-        return MyResponse._OK.addData("data", service.nonReceivedOrders(OrderType.FROM_DRIVER)).handleResponse();
+        return MyResponse._OK().addData("data", service.nonReceivedOrders(OrderType.FROM_DRIVER)).handleResponse();
     }
 
     @GetMapping(value = "non-received/user")
     public HttpEntity<?> nonReceivedOrdersUser() {
-        return MyResponse._OK.addData("data", service.nonReceivedOrders(OrderType.FROM_USER)).handleResponse();
+        return MyResponse._OK().addData("data", service.nonReceivedOrders(OrderType.FROM_USER)).handleResponse();
     }
 
     @PostMapping(value = "receive/{orderId}")
@@ -48,7 +54,7 @@ public record OrderController (
 
     @GetMapping(value = "history")
     public HttpEntity<?> currentDriversHistoryOfOrder() {
-        return MyResponse._OK.addData("data", service.currentDriversHistoryOfOrder()).handleResponse();
+        return MyResponse._OK().addData("data", service.currentDriversHistoryOfOrder()).handleResponse();
     }
 
     @PutMapping(value = "end-order")

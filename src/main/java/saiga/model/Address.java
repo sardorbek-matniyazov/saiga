@@ -3,9 +3,12 @@ package saiga.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import saiga.model.enums.AddressType;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
@@ -31,7 +34,16 @@ public class Address {
     @Column(name = "address_longitude")
     private Double longitude;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "address_type")
+    private AddressType addressType = AddressType.DYNAMIC;
+
     public Address(String title, double latitude, double longitude) {
+        this.title = title;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+    public Address(String title, double latitude, double longitude, AddressType addressType) {
         this.title = title;
         this.latitude = latitude;
         this.longitude = longitude;

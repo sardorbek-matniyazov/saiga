@@ -32,9 +32,4 @@ public record UserController(UserService service) {
     public HttpEntity<?> update(@RequestBody @Valid UpdateUserRequest updateUserRequest, @PathVariable Long id) {
         return service.update(id, updateUserRequest).handleResponse();
     }
-
-    @PostMapping(value = "top-up-balance")
-    public HttpEntity<?> topUpBalance(@RequestBody @Valid TopUpBalanceRequest topUpBalanceRequest) {
-        return service.topUpBalance(topUpBalanceRequest).handleResponse();
-    }
 }

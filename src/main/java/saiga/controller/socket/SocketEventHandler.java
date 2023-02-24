@@ -10,6 +10,8 @@ import saiga.payload.MyResponse;
 
 import java.util.Objects;
 
+import static saiga.payload.MyResponse._UPDATED;
+
 /**
  * @author :  Sardor Matniyazov
  * @mailto :  sardorbekmatniyazov03@gmail.com
@@ -30,7 +32,7 @@ public record SocketEventHandler (
         if(username != null) {
             messagingTemplate.convertAndSend(
                     "/topic/disconnect-user",
-                    MyResponse._UPDATED.setMessage("User Disconnected : " + username)
+                    _UPDATED().setMessage("User Disconnected : " + username)
             );
         }
     }

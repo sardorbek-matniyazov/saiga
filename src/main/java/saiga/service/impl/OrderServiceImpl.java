@@ -25,7 +25,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static saiga.payload.MyResponse.*;
+import static saiga.payload.MyResponse._CREATED;
+import static saiga.payload.MyResponse._UPDATED;
 import static saiga.utils.statics.Constants._PERCENT_ORDER_TAX;
 
 
@@ -60,7 +61,7 @@ public record OrderServiceImpl(
         // emitting to socket client
         emitNewOrderToSocket(savedOrder);
 
-        return _CREATED
+        return _CREATED()
                 .setMessage("Order created successfully")
                 .addData("data", orderDTOMapper.apply(savedOrder));
     }
@@ -82,7 +83,7 @@ public record OrderServiceImpl(
         // emitting to socket client
         emitNewOrderToSocket(savedOrder);
 
-        return _CREATED
+        return _CREATED()
                 .setMessage("Order created successfully")
                 .addData("data", orderDTOMapper.apply(savedOrder));
     }
@@ -120,7 +121,7 @@ public record OrderServiceImpl(
         // emit received order to socket client
         emitReceiverOrderToSocket(order);
 
-        return _CREATED
+        return _CREATED()
                 .setMessage("Order received successfully.")
                 .addData("data", orderDTOMapper.apply(order));
     }
@@ -148,7 +149,7 @@ public record OrderServiceImpl(
 
         saveOrderToDatabase(order);
 
-        return _UPDATED.setMessage("Order Successfully ended");
+        return _UPDATED().setMessage("Order Successfully ended");
     }
 
     @Override
@@ -174,7 +175,7 @@ public record OrderServiceImpl(
         // emit canceled order to socket
         emitNewOrderToSocket(order);
 
-        return _UPDATED.setMessage("Order Canceled successfully");
+        return _UPDATED().setMessage("Order Canceled successfully");
     }
 
     private Cabinet getCurrentUsersCabinet() {

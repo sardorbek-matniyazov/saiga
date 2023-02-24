@@ -25,27 +25,27 @@ public class GlobalHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = {AlreadyExistsException.class})
     public ResponseEntity<?> handleExists(AlreadyExistsException e) {
-        return _ALREADY_EXISTS.setMessage(e.getMessage()).handleResponse();
+        return _ALREADY_EXISTS().setMessage(e.getMessage()).handleResponse();
     }
 
     @ExceptionHandler(value = {UsernameNotFoundException.class})
     public ResponseEntity<?> handleUsernameNotFound(UsernameNotFoundException e) {
-        return _NOT_FOUND.setMessage(e.getMessage()).handleResponse();
+        return _NOT_FOUND().setMessage(e.getMessage()).handleResponse();
     }
 
     @ExceptionHandler(value = {NotFoundException.class})
     public ResponseEntity<?> handleNotFound(NotFoundException e) {
-        return _NOT_FOUND.setMessage(e.getMessage()).handleResponse();
+        return _NOT_FOUND().setMessage(e.getMessage()).handleResponse();
     }
 
     @ExceptionHandler(value = {BadRequestException.class})
     public ResponseEntity<?> handleBadRequest(BadRequestException e) {
-        return _BAD_REQUEST.setMessage(e.getMessage()).handleResponse();
+        return _BAD_REQUEST().setMessage(e.getMessage()).handleResponse();
     }
 
     @ExceptionHandler(value = {TypesInError.class})
     public ResponseEntity<?> handleIllegalTypes(TypesInError e) {
-        return _ILLEGAL_TYPES.setMessage(e.getMessage()).handleResponse();
+        return _ILLEGAL_TYPES().setMessage(e.getMessage()).handleResponse();
     }
 
     @Override
@@ -69,6 +69,6 @@ public class GlobalHandler extends ResponseEntityExceptionHandler {
         methodArgumentNotValidException.getBindingResult()
                 .getAllErrors().forEach(it -> messages.append(it.getDefaultMessage()).append(", "));
 
-        return _BAD_REQUEST.setMessage(messages.substring(0, messages.length() - 2)).handleResponse();
+        return _BAD_REQUEST().setMessage(messages.substring(0, messages.length() - 2)).handleResponse();
     }
 }

@@ -8,6 +8,9 @@ import saiga.payload.MyResponse;
 import saiga.payload.mapper.OrderDTOMapper;
 import saiga.service.OrderSocketService;
 
+import static saiga.payload.MyResponse._OK;
+import static saiga.payload.MyResponse._UPDATED;
+
 /**
  * @author :  Sardor Matniyazov
  * @mailto :  sardorbekmatniyazov03@gmail.com
@@ -21,7 +24,7 @@ public record OrderSocketServiceImpl(
 
     @Override
     public void sendOrderToClient(Order order, OrderType orderType) {
-        final MyResponse res = MyResponse._OK
+        final MyResponse res = _OK()
                 .setMessage("New order")
                 .addData("order", orderDTOMapper.apply(order));
 
@@ -39,7 +42,7 @@ public record OrderSocketServiceImpl(
 
     @Override
     public void sendReceivedOrderToClient(Order order, OrderType orderType) {
-        final MyResponse myResponse = MyResponse._UPDATED
+        final MyResponse myResponse = _UPDATED()
                 .setMessage("Order received")
                 .addData("order", orderDTOMapper.apply(order));
         switch (orderType) {

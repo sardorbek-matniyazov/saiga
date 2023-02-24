@@ -14,13 +14,23 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MyResponse {
-    public static final MyResponse _CREATED = new MyResponse(HttpStatus.CREATED);
-    public static final MyResponse _UPDATED = new MyResponse(HttpStatus.OK);
-    public static final MyResponse _ALREADY_EXISTS = new MyResponse(HttpStatus.BAD_REQUEST);
-    public static final MyResponse _BAD_REQUEST = new MyResponse(HttpStatus.BAD_REQUEST);
-    public static final MyResponse _NOT_FOUND = new MyResponse(HttpStatus.BAD_REQUEST);
-    public static final MyResponse _ILLEGAL_TYPES = new MyResponse(HttpStatus.BAD_REQUEST);
-    public static final MyResponse _OK = new MyResponse();
+    public static MyResponse _CREATED() { return new MyResponse(HttpStatus.CREATED);}
+    public static MyResponse _UPDATED() { return new MyResponse(HttpStatus.OK);}
+    public static MyResponse _ALREADY_EXISTS() {
+        return new MyResponse(HttpStatus.BAD_REQUEST);
+    }
+    public static MyResponse _BAD_REQUEST() {
+        return new MyResponse(HttpStatus.BAD_REQUEST);
+    }
+    public static MyResponse _NOT_FOUND() {
+        return new MyResponse(HttpStatus.BAD_REQUEST);
+    }
+    public static MyResponse _ILLEGAL_TYPES() {
+        return new MyResponse(HttpStatus.BAD_REQUEST);
+    }
+    public static MyResponse _OK() {
+        return new MyResponse();
+    }
 
 
     private String message = "OK";

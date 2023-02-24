@@ -11,6 +11,4 @@ public interface UserService {
     MyResponse signUp(SignUpRequest signUpDto);
 
     MyResponse update(Long id, UpdateUserRequest signUpDto);
-
-    MyResponse topUpBalance(TopUpBalanceRequest topUpBalanceRequest);
 }
