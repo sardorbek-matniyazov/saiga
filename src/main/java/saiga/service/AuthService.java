@@ -2,10 +2,9 @@ package saiga.service;
 
 import saiga.payload.MyResponse;
 import saiga.payload.request.SignUpRequest;
-import saiga.payload.request.TopUpBalanceRequest;
 import saiga.payload.request.UpdateUserRequest;
 
-public interface UserService {
+public interface AuthService {
     MyResponse signIn(String phoneNumber);
 
     MyResponse signUp(SignUpRequest signUpDto);

@@ -12,6 +12,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import static saiga.utils.statics.Constants._ENUM_LENGTH;
 import static saiga.utils.statics.Constants._TITLE_LENGTH;
 
 @Data
@@ -35,8 +36,11 @@ public class Address {
     private Double longitude;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "address_type")
+    @Column(name = "address_type", length = _ENUM_LENGTH)
     private AddressType addressType = AddressType.DYNAMIC;
+
+    @Column(name = "address_district", length = _TITLE_LENGTH)
+    private String district;
 
     public Address(String title, double latitude, double longitude) {
         this.title = title;

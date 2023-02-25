@@ -14,30 +14,11 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MyResponse {
-    public static MyResponse _CREATED() { return new MyResponse(HttpStatus.CREATED);}
-    public static MyResponse _UPDATED() { return new MyResponse(HttpStatus.OK);}
-    public static MyResponse _ALREADY_EXISTS() {
-        return new MyResponse(HttpStatus.BAD_REQUEST);
-    }
-    public static MyResponse _BAD_REQUEST() {
-        return new MyResponse(HttpStatus.BAD_REQUEST);
-    }
-    public static MyResponse _NOT_FOUND() {
-        return new MyResponse(HttpStatus.BAD_REQUEST);
-    }
-    public static MyResponse _ILLEGAL_TYPES() {
-        return new MyResponse(HttpStatus.BAD_REQUEST);
-    }
-    public static MyResponse _OK() {
-        return new MyResponse();
-    }
-
-
     private String message = "OK";
     private boolean active = true;
     @JsonIgnore
     private int code = 200;
-    private Map<String, Object> body = new HashMap<>();
+    private final Map<String, Object> body = new HashMap<>();
 
     public MyResponse(HttpStatus created) {
         if (created.value() >= 400)
@@ -58,5 +39,23 @@ public class MyResponse {
 
     public ResponseEntity<Object> handleResponse() {
         return ResponseEntity.status(this.getCode()).body(this);
+    }
+
+    public static MyResponse _CREATED() { return new MyResponse(HttpStatus.CREATED);}
+    public static MyResponse _UPDATED() { return new MyResponse(HttpStatus.OK);}
+    public static MyResponse _ALREADY_EXISTS() {
+        return new MyResponse(HttpStatus.BAD_REQUEST);
+    }
+    public static MyResponse _BAD_REQUEST() {
+        return new MyResponse(HttpStatus.BAD_REQUEST);
+    }
+    public static MyResponse _NOT_FOUND() {
+        return new MyResponse(HttpStatus.BAD_REQUEST);
+    }
+    public static MyResponse _ILLEGAL_TYPES() {
+        return new MyResponse(HttpStatus.BAD_REQUEST);
+    }
+    public static MyResponse _OK() {
+        return new MyResponse();
     }
 }

@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 import static saiga.payload.MyResponse._CREATED;
 import static saiga.payload.MyResponse._UPDATED;
-import static saiga.utils.statics.Constants._PERCENT_ORDER_TAX;
+import static saiga.utils.statics.Constants._ORDER_TAX;
 
 
 /**
@@ -200,15 +200,15 @@ public record OrderServiceImpl(
     private void changeUsersBalanceByTax(Cabinet cabinet, char expressionMethod) {
         switch (expressionMethod) {
             case '-' -> {
-                if (cabinet.getBalance().compareTo(_PERCENT_ORDER_TAX) < 0)
+                if (cabinet.getBalance().compareTo(_ORDER_TAX) < 0)
                     throw new BadRequestException("You don't have enough tax amount for receive this order, please top up your balance.");
 
                 // subtracting tax amount
-                cabinet.setBalance(cabinet.getBalance().subtract(_PERCENT_ORDER_TAX));
+                cabinet.setBalance(cabinet.getBalance().subtract(_ORDER_TAX));
             }
             case '+' ->
                 // change current users balance
-                    cabinet.setBalance(cabinet.getBalance().subtract(_PERCENT_ORDER_TAX));
+                    cabinet.setBalance(cabinet.getBalance().subtract(_ORDER_TAX));
         }
     }
 

@@ -8,12 +8,11 @@ import java.util.Date;
 import java.util.logging.Logger;
 
 @Component
-@Slf4j
 public class JwtProvider {
+    private final Logger logger = Logger.getLogger(JwtProvider.class.getName());
+
     private static final String SECRET_KEY = "my-secure-key-is-banana";
     private static final Long EXPIRE_DATE = 1000L * 60 * 60 * 24 * 7;
-
-    private static final Logger logger = Logger.getLogger(JwtProvider.class.getName());
 
     public String generateToken(String username) {
         return Jwts.builder()

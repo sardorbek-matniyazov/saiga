@@ -8,16 +8,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import saiga.payload.request.SignUpRequest;
-import saiga.payload.request.TopUpBalanceRequest;
 import saiga.payload.request.UpdateUserRequest;
-import saiga.service.UserService;
+import saiga.service.AuthService;
 
 import javax.validation.Valid;
 import java.util.Map;
 
 @RestController
-@RequestMapping(value = "api/users")
-public record UserController(UserService service) {
+@RequestMapping(value = "api/auth")
+public record AuthController(AuthService service) {
     @PostMapping(value = "sign-in")
     public HttpEntity<?> signIn(@RequestBody @Valid Map<String, String> mp) {
         return service.signIn(mp.get("phoneNumber")).handleResponse();

@@ -14,7 +14,7 @@ import saiga.repository.RoleRepository;
 import saiga.repository.UserRepository;
 import saiga.security.CustomUserDetailsService;
 import saiga.security.JwtProvider;
-import saiga.service.UserService;
+import saiga.service.AuthService;
 import saiga.utils.exceptions.AlreadyExistsException;
 import saiga.utils.exceptions.NotFoundException;
 
@@ -22,7 +22,7 @@ import static saiga.payload.MyResponse._CREATED;
 import static saiga.payload.MyResponse._UPDATED;
 
 @Service
-public record UserServiceImpl(
+public record AuthServiceImpl(
         UserRepository repository,
         CustomUserDetailsService userDetailsService,
         JwtProvider jwtProvider,
@@ -30,7 +30,7 @@ public record UserServiceImpl(
         UserDTOMapper userDtoMapper,
         CabinetRepository cabinetRepository,
         CabinetDTOMapper cabinetDTOMapper
-) implements UserService {
+) implements AuthService {
     @Override
     public MyResponse signIn(String phoneNumber) {
         final String token = jwtProvider.generateToken(phoneNumber);
