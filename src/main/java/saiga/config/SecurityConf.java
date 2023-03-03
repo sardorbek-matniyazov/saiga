@@ -53,7 +53,7 @@ public class SecurityConf {
                             authorityConfig.antMatchers("api/orders/user-order").hasRole("USER");
 
                             // admin privileges
-                            authorityConfig.antMatchers("/api/admin/**").hasRole("ADMIN");
+                            authorityConfig.antMatchers("/admin/**").hasRole("ADMIN");
 
                             authorityConfig.anyRequest().authenticated();
                         }
@@ -65,6 +65,7 @@ public class SecurityConf {
     @Bean
     public SecurityFilterChain securityFilterChainForAdmin(HttpSecurity http) throws Exception {
         return http
+                .csrf().disable().cors().disable()
                 .authorizeRequests(
                         authorityConfig -> {
                             authorityConfig.antMatchers("/ws/**", "/").permitAll();
@@ -73,6 +74,9 @@ public class SecurityConf {
                                     "/socket.io.js.map",
                                     "jquery-3.3.1.min.js",
                                     "moment-2.24.0.min.js").permitAll();
+
+                            // admin privileges
+                            authorityConfig.antMatchers("/admin/**").hasRole("ADMIN");
 
                             authorityConfig.anyRequest().authenticated();
                         }

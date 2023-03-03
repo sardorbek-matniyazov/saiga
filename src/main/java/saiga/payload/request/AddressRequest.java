@@ -1,5 +1,9 @@
 package saiga.payload.request;
 
+import javax.validation.constraints.Size;
+
+import static saiga.utils.statics.Constants._TITLE_LENGTH;
+
 /**
  * @author :  Sardor Matniyazov
  * @mailto :  sardorbekmatniyazov03@gmail.com
@@ -8,7 +12,9 @@ package saiga.payload.request;
 public record AddressRequest(
         double lat,
         double lon,
-
-        String title
+        @Size(min = 5, max = _TITLE_LENGTH)
+        String title,
+        @Size(min = 5, max = _TITLE_LENGTH)
+        String district
 ) {
 }

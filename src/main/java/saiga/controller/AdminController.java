@@ -20,18 +20,18 @@ import static saiga.payload.MyResponse._OK;
  * @created : 24 Feb 2023
  **/
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("admin")
 public record AdminController(
         AdminService adminService
 ) {
 
-    @PostMapping(value = "/static-address")
+    @PostMapping(value = "static-address")
     public HttpEntity<?> createStaticAddress(@RequestBody @Valid AddressRequest addressRequest) {
         return adminService.createStaticAddress(addressRequest).handleResponse();
     }
 
-    @GetMapping(value = "/static-address")
-    public HttpEntity<?> getAllStaticAddress(@RequestBody @Valid AddressRequest addressRequest) {
+    @GetMapping(value = "static-address")
+    public HttpEntity<?> getAllStaticAddress() {
         return _OK().addData("data", adminService.getAllStaticAddresses()).handleResponse();
     }
 

@@ -43,14 +43,15 @@ public record AdminServiceImpl(
 
     @Override
     public MyResponse createStaticAddress(AddressRequest addressRequest) {
-        if (addressRepository.existsByTitleAndAddressType(addressRequest.title(), AddressType.STATIC))
+        if (addressRepository.existsByTitleAndDistrictAndAddressType(addressRequest.title(), addressRequest.district(), AddressType.STATIC))
             throw new AlreadyExistsException("This static address already exists");
         final Address save = addressRepository.save(
                 new Address(
                         addressRequest.title(),
                         addressRequest.lat(),
                         addressRequest.lon(),
-                        AddressType.STATIC
+                        AddressType.STATIC,
+                        addressRequest.district()
                 )
         );
         return _CREATED()

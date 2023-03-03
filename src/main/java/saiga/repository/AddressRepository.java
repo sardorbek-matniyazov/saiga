@@ -15,4 +15,6 @@ public interface AddressRepository extends JpaRepository<Address, Long> {
     boolean existsByTitleAndAddressType(String title, AddressType aStatic);
 
     List<Address> findAllByAddressType(AddressType aStatic);
+
+    boolean existsByTitleAndDistrictAndAddressType(String title, String district, AddressType aStatic);
 }

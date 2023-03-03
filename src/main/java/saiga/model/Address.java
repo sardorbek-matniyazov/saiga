@@ -12,6 +12,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import static javax.persistence.GenerationType.IDENTITY;
 import static saiga.utils.statics.Constants._ENUM_LENGTH;
 import static saiga.utils.statics.Constants._TITLE_LENGTH;
 
@@ -21,7 +22,7 @@ import static saiga.utils.statics.Constants._TITLE_LENGTH;
 @Entity(name = "address")
 public class Address {
     @Id
-    @GeneratedValue(strategy = javax.persistence.GenerationType.IDENTITY)
+    @GeneratedValue(strategy = IDENTITY)
     @Column(name = "address_id")
     private Long id;
 
@@ -47,7 +48,7 @@ public class Address {
         this.latitude = latitude;
         this.longitude = longitude;
     }
-    public Address(String title, double latitude, double longitude, AddressType addressType) {
+    public Address(String title, double latitude, double longitude, AddressType addressType, String district) {
         this.title = title;
         this.latitude = latitude;
         this.longitude = longitude;
