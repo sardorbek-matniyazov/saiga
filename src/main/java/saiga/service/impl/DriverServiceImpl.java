@@ -38,7 +38,7 @@ public record DriverServiceImpl(
 
         final BalanceInOutDTO balance = new BalanceInOutDTO(
                 currentCabinet.getBalance(),
-                benefit == null  ? BigDecimal.ZERO : benefit,
+                benefit == null ? BigDecimal.ZERO : benefit,
                 balanceOut == null ? BigDecimal.ZERO : _ORDER_TAX.multiply(BigDecimal.valueOf(balanceOut))
         );
 

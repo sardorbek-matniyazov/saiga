@@ -5,6 +5,8 @@ import saiga.payload.request.DirectionRequest;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+import static saiga.utils.statics.Constants._TITLE_LENGTH;
+
 /**
  * @author :  Sardor Matniyazov
  * @mailto :  sardorbekmatniyazov03@gmail.com
@@ -14,6 +16,7 @@ public class DriverOrderDirectionHandler implements ConstraintValidator<CheckDri
     @Override
     public boolean isValid(DirectionRequest directionRequest, ConstraintValidatorContext constraintValidatorContext) {
         return directionRequest != null
-                && (directionRequest.addressFrom() != null && directionRequest.addressTo() != null);
+                && (directionRequest.addressFrom() != null && (directionRequest.addressFrom().title() == null || directionRequest.addressFrom().title().length() <= _TITLE_LENGTH))
+                && (directionRequest.addressTo() != null && (directionRequest.addressTo().title() == null || directionRequest.addressTo().title().length() <= _TITLE_LENGTH));
     }
 }

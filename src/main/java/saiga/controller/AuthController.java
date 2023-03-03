@@ -16,7 +16,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping(value = "api/auth")
-public record AuthController(AuthService service) {
+public record AuthController (AuthService service) {
     @PostMapping(value = "sign-in")
     public HttpEntity<?> signIn(@RequestBody @Valid Map<String, String> mp) {
         return service.signIn(mp.get("phoneNumber")).handleResponse();

@@ -23,9 +23,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Double countByCabinetToIdAndStatus(Long cabinetTo_id, OrderStatus status);
 
     @Query(
-            value = "select sum(money) " +
-                    "from orders " +
-                    "where cabinet_to_cabinet_id = 2 and order_status = 'ORDERED';",
+            value = """
+                    select sum(money) from orders where cabinet_to_cabinet_id = 2 and order_status = 'ORDERED'
+                    """,
             nativeQuery = true
     )
     BigDecimal sumOfBenefitByCabinetToIdAndStatus(Long id, OrderStatus ordered);

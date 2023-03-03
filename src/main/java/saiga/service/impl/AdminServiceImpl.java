@@ -1,10 +1,12 @@
 package saiga.service.impl;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import saiga.model.Address;
 import saiga.model.Cabinet;
 import saiga.model.enums.AddressType;
 import saiga.payload.MyResponse;
+import saiga.payload.dto.CabinetDTO;
 import saiga.payload.mapper.CabinetDTOMapper;
 import saiga.payload.request.AddressRequest;
 import saiga.payload.request.TopUpBalanceRequest;
@@ -14,8 +16,10 @@ import saiga.service.AdminService;
 import saiga.utils.exceptions.AlreadyExistsException;
 import saiga.utils.exceptions.NotFoundException;
 
+import java.util.List;
+
 import static saiga.payload.MyResponse._CREATED;
-import static saiga.payload.MyResponse._OK;
+import static saiga.payload.MyResponse._UPDATED;
 import static saiga.utils.statics.GlobalMethodsToHelp.parseStringMoneyToBigDecimalValue;
 
 /**
@@ -30,10 +34,11 @@ public record AdminServiceImpl(
         CabinetDTOMapper cabinetDTOMapper
 ) implements AdminService {
     @Override
-    public MyResponse getAllCabinets() {
-        return _OK().addData(
-                "data", cabinetRepository.findAll().stream().map(cabinetDTOMapper).toList()
-        );
+    public List<CabinetDTO> getAllCabinets() {
+        return cabinetRepository.findAll(Sort.by(Sort.Direction.DESC, "id"))
+                        .stream()
+                        .map(cabinetDTOMapper)
+                        .toList();
     }
 
     @Override
@@ -54,8 +59,8 @@ public record AdminServiceImpl(
     }
 
     @Override
-    public MyResponse getAllStaticAddresses() {
-        return _OK().addData("data", addressRepository.findAllByAddressType(AddressType.STATIC));
+    public List<Address> getAllStaticAddresses() {
+        return addressRepository.findAllByAddressType(AddressType.STATIC);
     }
 
     @Override
@@ -66,7 +71,7 @@ public record AdminServiceImpl(
 
         cabinet.setBalance(cabinet.getBalance().add(parseStringMoneyToBigDecimalValue(topUpBalanceRequest.amount())));
 
-        return MyResponse._UPDATED()
+        return _UPDATED()
                 .setMessage("Transfer successfully")
                 .addData("data", cabinetDTOMapper.apply(cabinetRepository.save(cabinet)));
     }

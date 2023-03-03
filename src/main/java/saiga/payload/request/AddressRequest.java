@@ -8,6 +8,7 @@ package saiga.payload.request;
 public record AddressRequest(
         double lat,
         double lon,
+
         String title
 ) {
 }
