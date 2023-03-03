@@ -7,7 +7,7 @@ spring:
   datasource:
     username: postgres
     url: jdbc:postgresql://localhost:5432/saiga
-    password: sardor2003
+    password: this_is_your_password
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
