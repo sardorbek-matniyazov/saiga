@@ -52,5 +52,7 @@ public class Address {
         this.title = title;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.district = district;
+        this.addressType = addressType;
     }
 }
