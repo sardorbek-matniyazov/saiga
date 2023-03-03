@@ -18,7 +18,6 @@ public record SignUpRequest(
         @Size(min = 2, max = _NAME_LENGTH)
         @NotBlank(message = "Phone number is required")
         String lastName,
-        @Size(min = 2, max = _ENUM_LENGTH)
         @NotNull(message = "Role is required")
         RoleEnum role
 ) {
