@@ -4,7 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.access.event.AuthorizationFailureEvent;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -12,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import saiga.security.AdminAuthenticationProvider;
 import saiga.security.MyFilter;
@@ -33,12 +37,12 @@ public class SecurityConf {
         this.myFilter = myFilter;
     }
 
-    @Order(1)
     @Bean
+    @Order(Ordered.HIGHEST_PRECEDENCE)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf().disable().cors().disable()
-                .requestMatcher(request -> request.getRequestURI().startsWith("/api"))
+                .antMatcher("/api/**")
                 .authorizeRequests(
                         authorityConfig -> {
                             authorityConfig.antMatchers("/api/auth/sign-in", "/api/auth/sign-up").permitAll();
@@ -50,19 +54,21 @@ public class SecurityConf {
                                     "api/orders/receive/*", "api/orders/history").hasRole("DRIVER");
 
                             // user privileges
-                            authorityConfig.antMatchers("api/orders/user-order").hasRole("USER");
+                            authorityConfig.antMatchers(HttpMethod.POST, "api/orders/user-order").hasRole("USER");
 
                             // admin privileges
                             authorityConfig.antMatchers("/admin/**").hasRole("ADMIN");
 
                             authorityConfig.anyRequest().authenticated();
                         }
-                ).addFilterBefore(myFilter, UsernamePasswordAuthenticationFilter.class)
+                )
+                .addFilterBefore(myFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().build();
     }
 
     @Bean
+    @Order(2)
     public SecurityFilterChain securityFilterChainForAdmin(HttpSecurity http) throws Exception {
         return http
                 .csrf().disable().cors().disable()
@@ -99,5 +105,12 @@ public class SecurityConf {
                         event.getAuthentication().getAuthorities()
                 )
         );
+    }
+
+    @Bean ApplicationListener<AuthorizationFailureEvent> badCredentialsEventApplicationListener() {
+        return event -> {
+
+            logger.warning(String.format("User { %s } failed to log in", event.getAuthentication().getName()));
+        };
     }
 }
