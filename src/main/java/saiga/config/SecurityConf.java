@@ -81,6 +81,9 @@ public class SecurityConf {
                                     "jquery-3.3.1.min.js",
                                     "moment-2.24.0.min.js").permitAll();
 
+                            // telegram authority enables
+                            authorityConfig.antMatchers("/telegram/**").permitAll();
+
                             // admin privileges
                             authorityConfig.antMatchers("/admin/**").hasRole("ADMIN");
 

@@ -130,7 +130,7 @@ public class Order extends BaseCreatable {
                         direction.addressFrom().lat(),
                         direction.addressFrom().lon()
                 ),
-                direction.addressTo().lat() == 0
+                direction.addressTo() == null || direction.addressTo().lat() == 0
                         ? null
                         : new Address(
                         direction.addressTo().title(),

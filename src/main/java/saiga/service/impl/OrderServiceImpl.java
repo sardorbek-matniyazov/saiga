@@ -17,17 +17,17 @@ import saiga.payload.request.UserOrderRequest;
 import saiga.repository.CabinetRepository;
 import saiga.repository.OrderRepository;
 import saiga.service.OrderService;
-import saiga.service.OrderSocketService;
+import saiga.service.OrderDeliverService;
 import saiga.utils.exceptions.BadRequestException;
 import saiga.utils.exceptions.NotFoundException;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static saiga.payload.MyResponse._CREATED;
 import static saiga.payload.MyResponse._UPDATED;
 import static saiga.utils.statics.Constants._ORDER_TAX;
+import static saiga.utils.statics.GlobalMethodsToHelp.parseStringMoneyToBigDecimalValue;
 
 
 /**
@@ -40,7 +40,8 @@ public record OrderServiceImpl(
         OrderRepository repository,
         CabinetRepository cabinetRepository,
         OrderDTOMapper orderDTOMapper,
-        OrderSocketService orderSocketService
+        OrderDeliverService orderDeliverSocketServiceImpl,
+        OrderDeliverService orderDeliverTelegramServiceImpl
 ) implements OrderService {
     @Override
     public MyResponse driversOrder(DriverOrderRequest driverOrderRequest) {
@@ -60,6 +61,9 @@ public record OrderServiceImpl(
 
         // emitting to socket client
         emitNewOrderToSocket(savedOrder);
+
+        // sending order to telegram
+        emitNewOrderToTelegram(savedOrder);
 
         return _CREATED()
                 .setMessage("Order created successfully")
@@ -82,6 +86,9 @@ public record OrderServiceImpl(
 
         // emitting to socket client
         emitNewOrderToSocket(savedOrder);
+
+        // sending order to telegram
+        emitNewOrderToTelegram(savedOrder);
 
         return _CREATED()
                 .setMessage("Order created successfully")
@@ -119,7 +126,10 @@ public record OrderServiceImpl(
         order = saveOrderToDatabase(order);
 
         // emit received order to socket client
-        emitReceiverOrderToSocket(order);
+        emitReceivedOrderToSocket(order);
+
+        // sending order to telegram
+        emitReceivedOrderToTelegram(order);
 
         return _CREATED()
                 .setMessage("Order received successfully.")
@@ -138,8 +148,16 @@ public record OrderServiceImpl(
     public MyResponse endOrderById(OrderEndRequest orderEndRequest) {
         final Order order = getOrderById(orderEndRequest.orderId());
 
+        // check if order is received
+        if (order.getStatus().equals(OrderStatus.ACTIVE))
+            throw new BadRequestException("Order is not received yet!");
+
+        // check if order is ended
+        if (order.getStatus().equals(OrderStatus.ORDERED))
+            throw new BadRequestException("Order is already ended!");
+
         // money of clients screen
-        order.setMoney(BigDecimal.valueOf(orderEndRequest.orderMoney()));
+        order.setMoney(parseStringMoneyToBigDecimalValue(orderEndRequest.orderMoney()));
 
         // set length of the taken way
         order.setLengthOfWay(orderEndRequest.OrderLengthOfWay());
@@ -156,6 +174,14 @@ public record OrderServiceImpl(
     public MyResponse cancelOwnOrderByOrderId(Long id) {
         Order order = getOrderById(id);
         final Cabinet currentUsersCabinet = getCurrentUsersCabinet();
+
+        // check if order is not received
+        if (order.getStatus().equals(OrderStatus.ACTIVE))
+            throw new BadRequestException("Order is not received yet!");
+
+        // check if order is ended
+        if (order.getStatus().equals(OrderStatus.ORDERED))
+            throw new BadRequestException("Order is already ended!");
 
         if (currentUsersCabinet.getId().equals(order.getCabinetTo().getId()))
             throw new BadRequestException("You only can cancel your own received order");
@@ -174,6 +200,9 @@ public record OrderServiceImpl(
 
         // emit canceled order to socket
         emitNewOrderToSocket(order);
+
+        // emit canceled order to telegram
+        emitNewOrderToTelegram(order);
 
         return _UPDATED().setMessage("Order Canceled successfully");
     }
@@ -213,10 +242,18 @@ public record OrderServiceImpl(
     }
 
     private void emitNewOrderToSocket(Order order) {
-        orderSocketService.sendOrderToClient(order, order.getType());
+        orderDeliverSocketServiceImpl.sendOrderToClient(order, order.getType());
     }
 
-    private void emitReceiverOrderToSocket(Order order) {
-        orderSocketService.sendReceivedOrderToClient(order, order.getType());
+    private void emitReceivedOrderToSocket(Order order) {
+        orderDeliverSocketServiceImpl.sendReceivedOrderToClient(order, order.getType());
+    }
+
+    private void emitNewOrderToTelegram(Order order) {
+        orderDeliverTelegramServiceImpl.sendOrderToClient(order, order.getType());
+    }
+
+    private void emitReceivedOrderToTelegram(Order order) {
+        orderDeliverTelegramServiceImpl.sendReceivedOrderToClient(order, order.getType());
     }
 }

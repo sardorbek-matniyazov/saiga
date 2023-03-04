@@ -11,7 +11,7 @@ public record OrderEndRequest(
         @NotNull(message = "Order id required")
         Long orderId,
         @NotNull(message = "Order money is required")
-        Double orderMoney,
+        String orderMoney,
         @NotNull(message = "Order Length of Way is required")
         Double OrderLengthOfWay
 ) {

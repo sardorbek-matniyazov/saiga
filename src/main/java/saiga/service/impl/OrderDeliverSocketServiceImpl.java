@@ -6,7 +6,7 @@ import saiga.model.Order;
 import saiga.model.enums.OrderType;
 import saiga.payload.MyResponse;
 import saiga.payload.mapper.OrderDTOMapper;
-import saiga.service.OrderSocketService;
+import saiga.service.OrderDeliverService;
 
 import static saiga.payload.MyResponse._OK;
 import static saiga.payload.MyResponse._UPDATED;
@@ -17,10 +17,10 @@ import static saiga.payload.MyResponse._UPDATED;
  * @created : 12 Feb 2023
  **/
 @Service
-public record OrderSocketServiceImpl(
+public record OrderDeliverSocketServiceImpl(
         SimpMessageSendingOperations messagingTemplate,
         OrderDTOMapper orderDTOMapper
-) implements OrderSocketService {
+) implements OrderDeliverService {
 
     @Override
     public void sendOrderToClient(Order order, OrderType orderType) {

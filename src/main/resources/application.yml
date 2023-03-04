@@ -18,3 +18,9 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQL10Dialect
         format_sql: true
         enable_lazy_load_no_trans: true
+telegram:
+  botToken: 6225643427:AAEflrHOn9z452Re6wvcE4X2Z57OppPpMIU
+  botUrl: bot6225643427:AAEflrHOn9z452Re6wvcE4X2Z57OppPpMIU
+  botUsername: saiga_nk_bot
+  groupId: -1001527780938
+  groupName: saiga_nk
