@@ -2,10 +2,9 @@ package saiga.service.impl;
 
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
-import saiga.model.Order;
 import saiga.model.enums.OrderType;
 import saiga.payload.MyResponse;
-import saiga.payload.mapper.OrderDTOMapper;
+import saiga.payload.dto.OrderDTO;
 import saiga.service.OrderDeliverService;
 
 import static saiga.payload.MyResponse._OK;
@@ -18,15 +17,14 @@ import static saiga.payload.MyResponse._UPDATED;
  **/
 @Service
 public record OrderDeliverSocketServiceImpl(
-        SimpMessageSendingOperations messagingTemplate,
-        OrderDTOMapper orderDTOMapper
+        SimpMessageSendingOperations messagingTemplate
 ) implements OrderDeliverService {
 
     @Override
-    public void sendOrderToClient(Order order, OrderType orderType) {
+    public void sendOrderToClient(OrderDTO orderDTO, OrderType orderType) {
         final MyResponse res = _OK()
                 .setMessage("New order")
-                .addData("order", orderDTOMapper.apply(order));
+                .addData("order", orderDTO);
 
         switch (orderType) {
             case FROM_DRIVER -> messagingTemplate.convertAndSend(
@@ -41,10 +39,10 @@ public record OrderDeliverSocketServiceImpl(
     }
 
     @Override
-    public void sendReceivedOrderToClient(Order order, OrderType orderType) {
+    public void sendReceivedOrderToClient(OrderDTO orderDTO, OrderType orderType) {
         final MyResponse myResponse = _UPDATED()
                 .setMessage("Order received")
-                .addData("order", orderDTOMapper.apply(order));
+                .addData("order", orderDTO);
         switch (orderType) {
             case FROM_DRIVER -> messagingTemplate.convertAndSend(
                     "/topic/received-order-from-driver",
@@ -52,6 +50,23 @@ public record OrderDeliverSocketServiceImpl(
             );
             case FROM_USER -> messagingTemplate.convertAndSend(
                     "/topic/received-order-from-user",
+                    myResponse
+            );
+        }
+    }
+
+    @Override
+    public void sendCanceledOrderToClient(OrderDTO orderDTO, OrderType orderType) {
+        final MyResponse myResponse = _UPDATED()
+                .setMessage("Order received")
+                .addData("order", orderDTO);
+        switch (orderType) {
+            case FROM_DRIVER -> messagingTemplate.convertAndSend(
+                    "/topic/cancel-order-from-driver",
+                    myResponse
+            );
+            case FROM_USER -> messagingTemplate.convertAndSend(
+                    "/topic/cancel-order-from-user",
                     myResponse
             );
         }

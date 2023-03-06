@@ -1,6 +1,5 @@
 package saiga.service;
 
-import org.springframework.http.HttpEntity;
 import saiga.model.enums.OrderType;
 import saiga.payload.MyResponse;
 import saiga.payload.dto.OrderDTO;
@@ -28,5 +27,7 @@ public interface OrderService {
 
     MyResponse endOrderById(OrderEndRequest orderEndRequest);
 
-    MyResponse cancelOwnOrderByOrderId(Long id);
+    MyResponse cancelOwnReceivedOrderByOrderId(Long id);
+
+    MyResponse cancelOwnNonReceivedOrderByOrderId(Long id);
 }

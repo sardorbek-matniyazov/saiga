@@ -1,7 +1,7 @@
 package saiga.service;
 
-import saiga.model.Order;
 import saiga.model.enums.OrderType;
+import saiga.payload.dto.OrderDTO;
 
 /**
  * @author :  Sardor Matniyazov
@@ -9,6 +9,8 @@ import saiga.model.enums.OrderType;
  * @created : 12 Feb 2023
  **/
 public interface OrderDeliverService {
-    void sendOrderToClient(Order order, OrderType orderType);
-    void sendReceivedOrderToClient(Order order, OrderType orderType);
+    void sendOrderToClient(OrderDTO order, OrderType type);
+    void sendReceivedOrderToClient(OrderDTO order, OrderType type);
+
+    void sendCanceledOrderToClient(OrderDTO order, OrderType type);
 }

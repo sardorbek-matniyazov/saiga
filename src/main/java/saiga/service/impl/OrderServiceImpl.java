@@ -1,7 +1,6 @@
 package saiga.service.impl;
 
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import saiga.model.Cabinet;
 import saiga.model.Order;
@@ -27,6 +26,7 @@ import java.util.stream.Collectors;
 import static saiga.payload.MyResponse._CREATED;
 import static saiga.payload.MyResponse._UPDATED;
 import static saiga.utils.statics.Constants._ORDER_TAX;
+import static saiga.utils.statics.GlobalMethodsToHelp.getCurrentUser;
 import static saiga.utils.statics.GlobalMethodsToHelp.parseStringMoneyToBigDecimalValue;
 
 
@@ -171,7 +171,7 @@ public record OrderServiceImpl(
     }
 
     @Override
-    public MyResponse cancelOwnOrderByOrderId(Long id) {
+    public MyResponse cancelOwnReceivedOrderByOrderId(Long id) {
         Order order = getOrderById(id);
         final Cabinet currentUsersCabinet = getCurrentUsersCabinet();
 
@@ -207,9 +207,34 @@ public record OrderServiceImpl(
         return _UPDATED().setMessage("Order Canceled successfully");
     }
 
+    @Override
+    public MyResponse cancelOwnNonReceivedOrderByOrderId(Long id) {
+        final Order order = repository.findById(id).orElseThrow(
+                () -> new NotFoundException("Order with id " + id + " not found")
+        );
+
+        // check if order status is received
+        if (order.getStatus().equals(OrderStatus.RECEIVED))
+            throw new BadRequestException("Order has received you can't cancel it now!");
+
+        // check if order status is ordered
+        if (order.getStatus().equals(OrderStatus.ORDERED))
+            throw new BadRequestException("Order has already done you can't cancel it now!");
+
+        // deleting canceled order, maybe later we use status instead of delete it
+        repository.deleteById(id);
+
+        // emitting deleted order to socket
+        emitDeletedOrderToSocket(order);
+
+        // emitting deleted order to Telegram
+        emitDeletedOrderToTelegram(order);
+        return null;
+    }
+
     private Cabinet getCurrentUsersCabinet() {
         // get current authenticated user
-        final User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        final User currentUser = getCurrentUser();
 
         return cabinetRepository.findByUserId(currentUser.getId()).orElseThrow(
                 () -> new NotFoundException("You haven't an access to create order !")
@@ -237,23 +262,31 @@ public record OrderServiceImpl(
             }
             case '+' ->
                 // change current users balance
-                    cabinet.setBalance(cabinet.getBalance().subtract(_ORDER_TAX));
+                cabinet.setBalance(cabinet.getBalance().subtract(_ORDER_TAX));
         }
     }
 
     private void emitNewOrderToSocket(Order order) {
-        orderDeliverSocketServiceImpl.sendOrderToClient(order, order.getType());
+        orderDeliverSocketServiceImpl.sendOrderToClient(orderDTOMapper.apply(order), order.getType());
     }
 
     private void emitReceivedOrderToSocket(Order order) {
-        orderDeliverSocketServiceImpl.sendReceivedOrderToClient(order, order.getType());
+        orderDeliverSocketServiceImpl.sendReceivedOrderToClient(orderDTOMapper.apply(order), order.getType());
     }
 
     private void emitNewOrderToTelegram(Order order) {
-        orderDeliverTelegramServiceImpl.sendOrderToClient(order, order.getType());
+        orderDeliverTelegramServiceImpl.sendOrderToClient(orderDTOMapper.apply(order), order.getType());
     }
 
     private void emitReceivedOrderToTelegram(Order order) {
-        orderDeliverTelegramServiceImpl.sendReceivedOrderToClient(order, order.getType());
+        orderDeliverTelegramServiceImpl.sendReceivedOrderToClient(orderDTOMapper.apply(order), order.getType());
+    }
+
+    private void emitDeletedOrderToSocket(Order order) {
+        orderDeliverSocketServiceImpl.sendCanceledOrderToClient(orderDTOMapper.apply(order), order.getType());
+    }
+
+    private void emitDeletedOrderToTelegram(Order order) {
+        orderDeliverTelegramServiceImpl.sendCanceledOrderToClient(orderDTOMapper.apply(order), order.getType());
     }
 }

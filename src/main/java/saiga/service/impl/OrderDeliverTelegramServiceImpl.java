@@ -6,6 +6,7 @@ import saiga.client.TelegramFeignClient;
 import saiga.config.telegram.TelegramProperties;
 import saiga.model.Order;
 import saiga.model.enums.OrderType;
+import saiga.payload.dto.OrderDTO;
 import saiga.payload.telegram.TgSendMessage;
 import saiga.service.OrderDeliverService;
 
@@ -20,10 +21,12 @@ public record OrderDeliverTelegramServiceImpl (
         TelegramFeignClient telegramFeignClient
 ) implements OrderDeliverService {
     @Override
-    public void sendOrderToClient(Order order, OrderType orderType) {
+    public void sendOrderToClient(OrderDTO orderDTO, OrderType orderType) {
         String text = switch (orderType) {
             case FROM_DRIVER -> """
                     <b> Need a user to order </b>
+                    
+                    
                     <b>Order from driver</b>
                     <b>Direction:</b> <i>%s</i> to <i>%s</i>
                     <b>Amount of money:</b> <i>%s</i>
@@ -31,15 +34,17 @@ public record OrderDeliverTelegramServiceImpl (
                     <b>Comment:</b> <i>%s</i>
                     <b>Driver: </b> <i>%s</i> <i>%s</i>
                     """.formatted(
-                    order.getDirection().getAddressFrom().getTitle(),
-                    order.getDirection().getAddressTo().getTitle(),
-                    order.getMoney(),
-                    order.getTimeWhen(),
-                    order.getComment(),
-                    order.getCabinetFrom().getUser().getFirstName(),
-                    order.getCabinetFrom().getUser().getLastName());
+                    orderDTO.direction().getAddressFrom().getTitle(),
+                    orderDTO.direction().getAddressTo().getTitle(),
+                    orderDTO.money(),
+                    orderDTO.timeWhen(),
+                    orderDTO.comment(),
+                    orderDTO.fromUser().firstName(),
+                    orderDTO.fromUser().lastName());
             case FROM_USER -> """
                     <b>Need a taxi </b>
+                    
+                    
                     <b>Order from user</b>
                     <b>Direction:</b> <i>%s</i> to <i>%s</i>
                     <b>Amount of money:</b> <i>%s</i>
@@ -47,13 +52,13 @@ public record OrderDeliverTelegramServiceImpl (
                     <b>Comment:</b> <i>%s</i>
                     <b>User: </b> <i>%s</i> <i>%s</i>
                     """.formatted(
-                    order.getDirection().getAddressFrom().getTitle(),
-                    order.getDirection().getAddressTo() == null ? "No address" : order.getDirection().getAddressTo().getTitle(),
-                    order.getMoney(),
-                    order.getTimeWhen(),
-                    order.getComment(),
-                    order.getCabinetFrom().getUser().getFirstName(),
-                    order.getCabinetFrom().getUser().getLastName());
+                    orderDTO.direction().getAddressFrom().getTitle(),
+                    orderDTO.direction().getAddressTo() == null ? "No address" : orderDTO.direction().getAddressTo().getTitle(),
+                    orderDTO.money(),
+                    orderDTO.timeWhen(),
+                    orderDTO.comment(),
+                    orderDTO.fromUser().firstName(),
+                    orderDTO.fromUser().lastName());
         };
         TgSendMessage tgSendMessage = new TgSendMessage(
                 telegramProperties.getGroupId(),
@@ -65,10 +70,12 @@ public record OrderDeliverTelegramServiceImpl (
     }
 
     @Override
-    public void sendReceivedOrderToClient(Order order, OrderType orderType) {
+    public void sendReceivedOrderToClient(OrderDTO orderDTO, OrderType orderType) {
         String text = switch (orderType) {
             case FROM_DRIVER -> """
                     <b>Order from driver</b>
+                    
+                    
                     <b>Direction:</b> <i>%s</i> to <i>%s</i>
                     <b>Amount of money:</b> <i>%s</i>
                     <b>Time when:</b> <i>%s</i>
@@ -76,17 +83,19 @@ public record OrderDeliverTelegramServiceImpl (
                     <b>Driver: </b> <i>%s</i> <i>%s</i>
                     <b>Received by: </b> <i>%s</i> <i>%s</i>
                     """.formatted(
-                    order.getDirection().getAddressFrom().getTitle(),
-                    order.getDirection().getAddressTo().getTitle(),
-                    order.getMoney(),
-                    order.getTimeWhen(),
-                    order.getComment(),
-                    order.getCabinetFrom().getUser().getFirstName(),
-                    order.getCabinetFrom().getUser().getLastName(),
-                    order.getCabinetTo().getUser().getFirstName(),
-                    order.getCabinetTo().getUser().getLastName());
+                    orderDTO.direction().getAddressFrom().getTitle(),
+                    orderDTO.direction().getAddressTo().getTitle(),
+                    orderDTO.money(),
+                    orderDTO.timeWhen(),
+                    orderDTO.comment(),
+                    orderDTO.fromUser().firstName(),
+                    orderDTO.fromUser().lastName(),
+                    orderDTO.toUser().firstName(),
+                    orderDTO.toUser().lastName());
             case FROM_USER -> """
                     <b>Order from user</b>
+                    
+                    
                     <b>Direction:</b> <i>%s</i> to <i>%s</i>
                     <b>Amount of money:</b> <i>%s</i>
                     <b>Time when:</b> <i>%s</i>
@@ -94,15 +103,15 @@ public record OrderDeliverTelegramServiceImpl (
                     <b>User: </b> <i>%s</i> <i>%s</i>
                     <b>Received by: </b> <i>%s</i> <i>%s</i>
                     """.formatted(
-                    order.getDirection().getAddressFrom().getTitle(),
-                    order.getDirection().getAddressTo() == null ? "No address" : order.getDirection().getAddressTo().getTitle(),
-                    order.getMoney(),
-                    order.getTimeWhen(),
-                    order.getComment(),
-                    order.getCabinetFrom().getUser().getFirstName(),
-                    order.getCabinetFrom().getUser().getLastName(),
-                    order.getCabinetTo().getUser().getFirstName(),
-                    order.getCabinetTo().getUser().getLastName());
+                    orderDTO.direction().getAddressFrom().getTitle(),
+                    orderDTO.direction().getAddressTo() == null ? "No address" : orderDTO.direction().getAddressTo().getTitle(),
+                    orderDTO.money(),
+                    orderDTO.timeWhen(),
+                    orderDTO.comment(),
+                    orderDTO.fromUser().firstName(),
+                    orderDTO.fromUser().lastName(),
+                    orderDTO.toUser().firstName(),
+                    orderDTO.toUser().lastName());
         };
         TgSendMessage tgSendMessage = new TgSendMessage(
                 telegramProperties.getGroupId(),
@@ -112,5 +121,47 @@ public record OrderDeliverTelegramServiceImpl (
         );
 
         telegramFeignClient.sendMessageToTelegram(telegramProperties.getBotUrl(), tgSendMessage);
+    }
+
+    @Override
+    public void sendCanceledOrderToClient(OrderDTO orderDTO, OrderType orderType) {
+        String text = switch (orderType) {
+            case FROM_DRIVER -> """
+                    <b>Order Canceled</b>
+                    
+                    
+                    
+                    <b>Direction:</b> <i>%s</i> to <i>%s</i>
+                    <b>Amount of money:</b> <i>%s</i>
+                    <b>Time when:</b> <i>%s</i>
+                    <b>Comment:</b> <i>%s</i>
+                    <b>Driver: </b> <i>%s</i> <i>%s</i>
+                    """.formatted(
+                    orderDTO.direction().getAddressFrom().getTitle(),
+                    orderDTO.direction().getAddressTo().getTitle(),
+                    orderDTO.money(),
+                    orderDTO.timeWhen(),
+                    orderDTO.comment(),
+                    orderDTO.fromUser().firstName(),
+                    orderDTO.fromUser().lastName());
+            case FROM_USER -> """
+                    <b>Order Canceled</b>
+                    
+                    
+                    
+                    <b>Direction:</b> <i>%s</i> to <i>%s</i>
+                    <b>Amount of money:</b> <i>%s</i>
+                    <b>Time when:</b> <i>%s</i>
+                    <b>Comment:</b> <i>%s</i>
+                    <b>User: </b> <i>%s</i> <i>%s</i>
+                    """.formatted(
+                    orderDTO.direction().getAddressFrom().getTitle(),
+                    orderDTO.direction().getAddressTo() == null ? "No address" : orderDTO.direction().getAddressTo().getTitle(),
+                    orderDTO.money(),
+                    orderDTO.timeWhen(),
+                    orderDTO.comment(),
+                    orderDTO.fromUser().firstName(),
+                    orderDTO.fromUser().lastName());
+        };
     }
 }

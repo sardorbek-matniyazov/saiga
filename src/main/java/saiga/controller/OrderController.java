@@ -62,8 +62,13 @@ public record OrderController (
         return service.endOrderById(endRequest).handleResponse();
     }
 
-    @PutMapping(value = "cancel-order/{id}")
-    public HttpEntity<?> cancelOwnOrder(@PathVariable Long id) {
-        return service.cancelOwnOrderByOrderId(id).handleResponse();
+    @PutMapping(value = "cancel-non-received-order/{id}")
+    public HttpEntity<?> cancelOwnReceivedOrder(@PathVariable Long id) {
+        return service.cancelOwnReceivedOrderByOrderId(id).handleResponse();
+    }
+
+    @PutMapping(value = "cancel-received-order/{id}")
+    public HttpEntity<?> cancelOwnNonReceivedOrder(@PathVariable Long id) {
+        return service.cancelOwnNonReceivedOrderByOrderId(id).handleResponse();
     }
 }
