@@ -10,10 +10,14 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import saiga.config.SecurityConf;
 import saiga.utils.exceptions.AlreadyExistsException;
 import saiga.utils.exceptions.BadRequestException;
 import saiga.utils.exceptions.NotFoundException;
 import saiga.utils.exceptions.TypesInError;
+
+import java.net.UnknownHostException;
+import java.util.logging.Logger;
 
 import static saiga.payload.MyResponse._ALREADY_EXISTS;
 import static saiga.payload.MyResponse._BAD_REQUEST;
@@ -22,6 +26,8 @@ import static saiga.payload.MyResponse._NOT_FOUND;
 
 @ControllerAdvice
 public class GlobalHandler extends ResponseEntityExceptionHandler {
+
+    private final java.util.logging.Logger logger = Logger.getLogger(SecurityConf.class.getName());
 
     @ExceptionHandler(value = {AlreadyExistsException.class})
     public ResponseEntity<?> handleExists(AlreadyExistsException e) {
@@ -46,6 +52,14 @@ public class GlobalHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = {TypesInError.class})
     public ResponseEntity<?> handleIllegalTypes(TypesInError e) {
         return _ILLEGAL_TYPES().setMessage(e.getMessage()).handleResponse();
+    }
+
+    @ExceptionHandler(value = {UnknownHostException.class})
+    public void handleHostError (UnknownHostException e) {
+        logger.warning(String.format(
+                "Can't send message to client %s!",
+                e.getMessage()
+        ));
     }
 
     @Override

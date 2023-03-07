@@ -20,6 +20,8 @@ import saiga.service.OrderDeliverService;
 import saiga.utils.exceptions.BadRequestException;
 import saiga.utils.exceptions.NotFoundException;
 
+import javax.transaction.Transactional;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -107,7 +109,7 @@ public record OrderServiceImpl(
     public MyResponse receiveOrderById(Long orderId) {
         Order order = getOrderById(orderId);
 
-        if (order.getCabinetTo() != null)
+        if (order.getStatus().equals(OrderStatus.RECEIVED))
             throw new BadRequestException("Order already received!");
 
         final Cabinet currentUsersCabinet = getCurrentUsersCabinet();
@@ -209,9 +211,7 @@ public record OrderServiceImpl(
 
     @Override
     public MyResponse cancelOwnNonReceivedOrderByOrderId(Long id) {
-        final Order order = repository.findById(id).orElseThrow(
-                () -> new NotFoundException("Order with id " + id + " not found")
-        );
+        final Order order = getOrderById(id);
 
         // check if order status is received
         if (order.getStatus().equals(OrderStatus.RECEIVED))
