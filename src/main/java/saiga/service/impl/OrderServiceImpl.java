@@ -19,9 +19,8 @@ import saiga.service.OrderService;
 import saiga.service.OrderDeliverService;
 import saiga.utils.exceptions.BadRequestException;
 import saiga.utils.exceptions.NotFoundException;
+import saiga.utils.statics.MessageResourceHelperFunction;
 
-import javax.transaction.Transactional;
-import java.net.UnknownHostException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,7 +29,6 @@ import static saiga.payload.MyResponse._UPDATED;
 import static saiga.utils.statics.Constants._ORDER_TAX;
 import static saiga.utils.statics.GlobalMethodsToHelp.getCurrentUser;
 import static saiga.utils.statics.GlobalMethodsToHelp.parseStringMoneyToBigDecimalValue;
-
 
 /**
  * @author :  Sardor Matniyazov
@@ -43,7 +41,8 @@ public record OrderServiceImpl(
         CabinetRepository cabinetRepository,
         OrderDTOMapper orderDTOMapper,
         OrderDeliverService orderDeliverSocketServiceImpl,
-        OrderDeliverService orderDeliverTelegramServiceImpl
+        OrderDeliverService orderDeliverTelegramServiceImpl,
+        MessageResourceHelperFunction messageResourceHelper
 ) implements OrderService {
     @Override
     public MyResponse driversOrder(DriverOrderRequest driverOrderRequest) {
@@ -68,7 +67,8 @@ public record OrderServiceImpl(
         emitNewOrderToTelegram(savedOrder);
 
         return _CREATED()
-                .setMessage("Order created successfully")
+                .setMessage(
+                        messageResourceHelper.apply("order.created_success"))
                 .addData("data", orderDTOMapper.apply(savedOrder));
     }
 
@@ -93,7 +93,8 @@ public record OrderServiceImpl(
         emitNewOrderToTelegram(savedOrder);
 
         return _CREATED()
-                .setMessage("Order created successfully")
+                .setMessage(
+                        messageResourceHelper.apply("order.created_success"))
                 .addData("data", orderDTOMapper.apply(savedOrder));
     }
 
@@ -110,12 +111,14 @@ public record OrderServiceImpl(
         Order order = getOrderById(orderId);
 
         if (order.getStatus().equals(OrderStatus.RECEIVED))
-            throw new BadRequestException("Order already received!");
+            throw new BadRequestException(
+                    messageResourceHelper.apply("order.already_received"));
 
         final Cabinet currentUsersCabinet = getCurrentUsersCabinet();
 
         if (currentUsersCabinet.equals(order.getCabinetFrom()))
-            throw new BadRequestException("You can't receive your own order!");
+            throw new BadRequestException(
+                    messageResourceHelper.apply("order.cant_receive_own"));
 
         // change balance of user
         changeUsersBalanceByTax(currentUsersCabinet, '-');
@@ -134,7 +137,8 @@ public record OrderServiceImpl(
         emitReceivedOrderToTelegram(order);
 
         return _CREATED()
-                .setMessage("Order received successfully.")
+                .setMessage(
+                        messageResourceHelper.apply("order.created_success"))
                 .addData("data", orderDTOMapper.apply(order));
     }
 
@@ -152,11 +156,14 @@ public record OrderServiceImpl(
 
         // check if order is received
         if (order.getStatus().equals(OrderStatus.ACTIVE))
-            throw new BadRequestException("Order is not received yet!");
+            throw new BadRequestException(
+                    messageResourceHelper.apply("order.not_received")
+            );
 
         // check if order is ended
         if (order.getStatus().equals(OrderStatus.ORDERED))
-            throw new BadRequestException("Order is already ended!");
+            throw new BadRequestException(
+                    messageResourceHelper.apply("order.already_ended"));
 
         // money of clients screen
         order.setMoney(parseStringMoneyToBigDecimalValue(orderEndRequest.orderMoney()));
@@ -169,7 +176,8 @@ public record OrderServiceImpl(
 
         saveOrderToDatabase(order);
 
-        return _UPDATED().setMessage("Order Successfully ended");
+        return _UPDATED().setMessage(
+                messageResourceHelper.apply("order.end_success"));
     }
 
     @Override
@@ -179,7 +187,9 @@ public record OrderServiceImpl(
 
         // check if order is not received
         if (order.getStatus().equals(OrderStatus.ACTIVE))
-            throw new BadRequestException("Order is not received yet!");
+            throw new BadRequestException(
+                    messageResourceHelper.apply("order.not_received")
+            );
 
         // check if order is ended
         if (order.getStatus().equals(OrderStatus.ORDERED))
@@ -187,7 +197,8 @@ public record OrderServiceImpl(
 
         // check if order its own
         if (!currentUsersCabinet.getId().equals(order.getCabinetTo().getId()))
-            throw new BadRequestException("You can cancel your own order");
+            throw new BadRequestException(
+                    messageResourceHelper.apply("order.cant_cancel_somebody's_order"));
 
         // reset status of canceled order
         order.setStatus(OrderStatus.ACTIVE);
@@ -207,7 +218,8 @@ public record OrderServiceImpl(
         // emit canceled order to telegram
         emitNewOrderToTelegram(order);
 
-        return _UPDATED().setMessage("Order Canceled successfully");
+        return _UPDATED().setMessage(
+                messageResourceHelper.apply("order.cancel_success"));
     }
 
     @Override
@@ -216,15 +228,19 @@ public record OrderServiceImpl(
 
         // check if order status is received
         if (order.getStatus().equals(OrderStatus.RECEIVED))
-            throw new BadRequestException("Order has received you can't cancel it now!");
+            throw new BadRequestException(
+                    messageResourceHelper.apply("order.received_so_cant_cancel"));
 
         // check if order status is ordered
         if (order.getStatus().equals(OrderStatus.ORDERED))
-            throw new BadRequestException("Order has already done you can't cancel it now!");
+            throw new BadRequestException(
+                    messageResourceHelper.apply("order.ended_so_cant_cancel"));
 
         // check if order its own
         if (!getCurrentUsersCabinet().getId().equals(order.getCabinetFrom().getId()))
-            throw new BadRequestException("You can cancel your own order");
+            throw new BadRequestException(
+                    messageResourceHelper.apply("order.cant_cancel_somebody's_order")
+            );
 
         // deleting canceled order, maybe later we use status instead of delete it
         repository.deleteById(id);
@@ -235,7 +251,8 @@ public record OrderServiceImpl(
         // emitting deleted order to Telegram
         emitDeletedOrderToTelegram(order);
         return _UPDATED()
-                .setMessage("Order deleted!")
+                .setMessage(
+                        messageResourceHelper.apply("order.deleted_success"))
                 .addData("data", orderDTOMapper.apply(order));
     }
 
@@ -244,13 +261,19 @@ public record OrderServiceImpl(
         final User currentUser = getCurrentUser();
 
         return cabinetRepository.findByUserId(currentUser.getId()).orElseThrow(
-                () -> new NotFoundException("You haven't an access to create order !")
+                () -> new NotFoundException(
+                        messageResourceHelper.apply("order.access_denied"))
         );
     }
 
     private Order getOrderById(Long id) {
         return repository.findById(id).orElseThrow(
-                () -> new NotFoundException("Order not found with id " + id)
+                () -> new NotFoundException(
+                        String.format(
+                                messageResourceHelper.apply("order.not_found_with_id"),
+                                id
+                        )
+                )
         );
     }
 
@@ -262,7 +285,8 @@ public record OrderServiceImpl(
         switch (expressionMethod) {
             case '-' -> {
                 if (cabinet.getBalance().compareTo(_ORDER_TAX) < 0)
-                    throw new BadRequestException("You don't have enough tax amount for receive this order, please top up your balance.");
+                    throw new BadRequestException(
+                            messageResourceHelper.apply("order.haven't_enough_tax_amount"));
 
                 // subtracting tax amount
                 cabinet.setBalance(cabinet.getBalance().subtract(_ORDER_TAX));

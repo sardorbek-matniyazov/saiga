@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import saiga.client.TelegramFeignClient;
 import saiga.config.telegram.TelegramProperties;
-import saiga.model.Order;
 import saiga.model.enums.OrderType;
 import saiga.payload.dto.OrderDTO;
 import saiga.payload.telegram.TgSendMessage;

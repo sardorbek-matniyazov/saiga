@@ -9,6 +9,7 @@ import saiga.repository.CabinetRepository;
 import saiga.repository.OrderRepository;
 import saiga.service.DriverService;
 import saiga.utils.exceptions.NotFoundException;
+import saiga.utils.statics.MessageResourceHelperFunction;
 
 import java.math.BigDecimal;
 
@@ -24,13 +25,19 @@ import static saiga.utils.statics.GlobalMethodsToHelp.getCurrentUser;
 @Service
 public record DriverServiceImpl(
         CabinetRepository cabinetRepository,
-        OrderRepository orderRepository
+        OrderRepository orderRepository,
+        MessageResourceHelperFunction messageResourceHelper
 ) implements DriverService {
     @Override
     public MyResponse getBalanceInOut() {
         final User currentUser = getCurrentUser();
         final Cabinet currentCabinet = cabinetRepository.findByUserId(currentUser.getId()).orElseThrow(
-                () -> new NotFoundException("Cabinet not found")
+                () -> new NotFoundException(
+                        String.format(
+                                messageResourceHelper.apply("cabinet.not_found_with_user_id"),
+                                currentUser.getId()
+                        )
+                )
         );
 
         final BigDecimal benefit = orderRepository.sumOfBenefitByCabinetToIdAndStatus(currentCabinet.getId(), ORDERED);

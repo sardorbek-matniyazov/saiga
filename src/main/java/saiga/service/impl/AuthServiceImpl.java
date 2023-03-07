@@ -1,6 +1,5 @@
 package saiga.service.impl;
 
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import saiga.model.Cabinet;
 import saiga.model.Role;
@@ -18,8 +17,7 @@ import saiga.security.JwtProvider;
 import saiga.service.AuthService;
 import saiga.utils.exceptions.AlreadyExistsException;
 import saiga.utils.exceptions.NotFoundException;
-
-import java.util.Locale;
+import saiga.utils.statics.MessageResourceHelperFunction;
 
 import static saiga.payload.MyResponse._CREATED;
 import static saiga.payload.MyResponse._UPDATED;
@@ -33,29 +31,32 @@ public record AuthServiceImpl(
         UserDTOMapper userDtoMapper,
         CabinetRepository cabinetRepository,
         CabinetDTOMapper cabinetDTOMapper,
-        MessageSource messages
+        MessageResourceHelperFunction messageResourceHelper
 ) implements AuthService {
     @Override
     public MyResponse signIn(String phoneNumber) {
         final String token = jwtProvider.generateToken(phoneNumber);
         return _CREATED()
                 .setMessage(
-                        messages.getMessage(
-                                "login.success", null, Locale.ENGLISH))
+                        messageResourceHelper.apply("auth.signIn.success"))
                 .addData(
                         "data",
                         userDtoMapper.apply(repository.save(
                                 userDetailsService.loadUserByUsername(
                                         phoneNumber
-                                ).setToken(token)
-                        ))
-                ).addData("token", token);
+                                ).setToken(token))))
+                .addData("token", token);
     }
 
     @Override
     public MyResponse signUp(SignUpRequest signUpRequest) {
         if (repository.existsByPhoneNumber(signUpRequest.phoneNumber()))
-            throw new AlreadyExistsException("User with phone number " + signUpRequest.phoneNumber() + " already exists");
+            throw new AlreadyExistsException(
+                    String.format(
+                            messageResourceHelper.apply("user.already_exist_with_phone"),
+                            signUpRequest.phoneNumber()
+                    )
+            );
         final String token = jwtProvider.generateToken(signUpRequest.phoneNumber());
 
         return _CREATED()
@@ -75,17 +76,28 @@ public record AuthServiceImpl(
                                         )
                                 )
                         ).getUser()
-                )).setMessage("Sign Up successfully")
+                )).setMessage(
+                        messageResourceHelper.apply("auth.sigUp.success")
+                )
                 .addData("token", token);
     }
 
     @Override
     public MyResponse update(Long id, UpdateUserRequest updateUserRequest) {
         if (repository.existsByPhoneNumberAndIdIsNot(updateUserRequest.phoneNumber(), id))
-            throw new AlreadyExistsException("User with phone number " + updateUserRequest.phoneNumber() + " already exists");
+            throw new AlreadyExistsException(
+                    String.format(
+                            messageResourceHelper.apply("auth.signIn.success")
+                    )
+            );
 
         final User user = repository.findById(id).orElseThrow(
-                () -> new NotFoundException("User with id " + id + " not found")
+                () -> new NotFoundException(
+                        String.format(
+                                messageResourceHelper.apply("user.not_found_with_id"),
+                                updateUserRequest.phoneNumber()
+                        )
+                )
         );
 
         user.updateWithDto(updateUserRequest);
@@ -93,6 +105,7 @@ public record AuthServiceImpl(
         return _UPDATED()
                 .addData("data", userDtoMapper.apply(repository.save(user.setToken(token))))
                 .addData("token", token)
-                .setMessage("Updated successfully");
+                .setMessage(
+                        messageResourceHelper.apply("updated"));
     }
 }

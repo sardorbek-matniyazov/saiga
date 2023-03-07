@@ -9,8 +9,6 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import static saiga.utils.statics.Constants._ONLY_DIGITS_REGEX;
-
 /**
  * @author :  Sardor Matniyazov
  * @mailto :  sardorbekmatniyazov03@gmail.com
@@ -20,6 +18,7 @@ public class GlobalMethodsToHelp {
     public static Timestamp parseDdMMYyyyStringToDate(String s) {
         final Timestamp parse;
         try {
+            // todo: hour pattern should be added
             parse = new Timestamp(new SimpleDateFormat("dd-MM-yyyy").parse(s).getTime());
         } catch (ParseException e) {
             throw new TypesInError("non parseable date format");

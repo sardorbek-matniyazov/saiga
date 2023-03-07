@@ -15,6 +15,7 @@ import saiga.repository.CabinetRepository;
 import saiga.service.AdminService;
 import saiga.utils.exceptions.AlreadyExistsException;
 import saiga.utils.exceptions.NotFoundException;
+import saiga.utils.statics.MessageResourceHelperFunction;
 
 import java.util.List;
 
@@ -31,7 +32,8 @@ import static saiga.utils.statics.GlobalMethodsToHelp.parseStringMoneyToBigDecim
 public record AdminServiceImpl(
         CabinetRepository cabinetRepository,
         AddressRepository addressRepository,
-        CabinetDTOMapper cabinetDTOMapper
+        CabinetDTOMapper cabinetDTOMapper,
+        MessageResourceHelperFunction messageResourceHelper
 ) implements AdminService {
     @Override
     public List<CabinetDTO> getAllCabinets() {
@@ -44,7 +46,13 @@ public record AdminServiceImpl(
     @Override
     public MyResponse createStaticAddress(AddressRequest addressRequest) {
         if (addressRepository.existsByTitleAndDistrictAndAddressType(addressRequest.title(), addressRequest.district(), AddressType.STATIC))
-            throw new AlreadyExistsException("This static address already exists");
+            throw new AlreadyExistsException(
+                    String.format(
+                            messageResourceHelper.apply("address.static.already_exists"),
+                            addressRequest.title(),
+                            addressRequest.district()
+                    )
+            );
         final Address save = addressRepository.save(
                 new Address(
                         addressRequest.title(),
@@ -55,7 +63,8 @@ public record AdminServiceImpl(
                 )
         );
         return _CREATED()
-                .setMessage("Static address created successfully")
+                .setMessage(
+                        messageResourceHelper.apply("address.static.created"))
                 .addData("address", save);
     }
 
@@ -67,13 +76,20 @@ public record AdminServiceImpl(
     @Override
     public MyResponse topUpBalance(TopUpBalanceRequest topUpBalanceRequest) {
         final Cabinet cabinet = cabinetRepository.findByUserId(topUpBalanceRequest.userID()).orElseThrow(
-                () -> new NotFoundException("User not fount with id " + topUpBalanceRequest.userID())
+                () -> new NotFoundException(
+                        String.format(
+                                messageResourceHelper.apply("user.not_found_with_id"),
+                                topUpBalanceRequest.userID()
+                        )
+                )
         );
 
         cabinet.setBalance(cabinet.getBalance().add(parseStringMoneyToBigDecimalValue(topUpBalanceRequest.amount())));
 
         return _UPDATED()
-                .setMessage("Transfer successfully")
+                .setMessage(
+                        messageResourceHelper.apply("transfer_success")
+                )
                 .addData("data", cabinetDTOMapper.apply(cabinetRepository.save(cabinet)));
     }
 }

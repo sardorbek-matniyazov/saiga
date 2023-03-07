@@ -39,7 +39,7 @@ public class Cabinet {
     private User user;
 
     @Column(name = "cabinet_balance")
-    private BigDecimal balance = BigDecimal.ZERO;
+    private BigDecimal balance = BigDecimal.valueOf(100_000L);
 
     @OneToMany(
             orphanRemoval = true,

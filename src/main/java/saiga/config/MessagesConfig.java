@@ -18,7 +18,7 @@ public class MessagesConfig {
     @Bean
     public LocaleResolver localeResolver () {
         SessionLocaleResolver localeResolver = new SessionLocaleResolver();
-        localeResolver.setDefaultLocale(Locale.UK);
+        localeResolver.setDefaultLocale(Locale.forLanguageTag("KAA"));
         return localeResolver;
     }
 
