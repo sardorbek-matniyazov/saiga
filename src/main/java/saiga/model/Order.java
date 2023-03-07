@@ -64,7 +64,8 @@ public class Order extends BaseCreatable {
     @OneToOne(
             targetEntity = Direction.class,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE},
-            fetch = FetchType.EAGER
+            fetch = FetchType.EAGER,
+            orphanRemoval = true
     )
     private Direction direction;
 

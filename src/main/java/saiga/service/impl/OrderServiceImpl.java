@@ -185,8 +185,9 @@ public record OrderServiceImpl(
         if (order.getStatus().equals(OrderStatus.ORDERED))
             throw new BadRequestException("Order is already ended!");
 
-        if (currentUsersCabinet.getId().equals(order.getCabinetTo().getId()))
-            throw new BadRequestException("You only can cancel your own received order");
+        // check if order its own
+        if (!currentUsersCabinet.getId().equals(order.getCabinetTo().getId()))
+            throw new BadRequestException("You can cancel your own order");
 
         // reset status of canceled order
         order.setStatus(OrderStatus.ACTIVE);
@@ -221,6 +222,10 @@ public record OrderServiceImpl(
         if (order.getStatus().equals(OrderStatus.ORDERED))
             throw new BadRequestException("Order has already done you can't cancel it now!");
 
+        // check if order its own
+        if (!getCurrentUsersCabinet().getId().equals(order.getCabinetFrom().getId()))
+            throw new BadRequestException("You can cancel your own order");
+
         // deleting canceled order, maybe later we use status instead of delete it
         repository.deleteById(id);
 
@@ -229,7 +234,9 @@ public record OrderServiceImpl(
 
         // emitting deleted order to Telegram
         emitDeletedOrderToTelegram(order);
-        return null;
+        return _UPDATED()
+                .setMessage("Order deleted!")
+                .addData("data", orderDTOMapper.apply(order));
     }
 
     private Cabinet getCurrentUsersCabinet() {
