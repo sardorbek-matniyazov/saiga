@@ -32,8 +32,8 @@ jobs:
       - name: Save the artifact
         uses: actions/upload-artifact@master
         with:
-          name: backend-social-network
-          path: backend-social-network-${{ github.sha }}.jar
+          name: saiga-saiga.0.0.1
+          path: saiga-saiga.0.0.1-${{ github.sha }}.jar
 
   fake-deploy:
     runs-on: self-hosted
@@ -42,7 +42,7 @@ jobs:
       - name: Get the artifact
         uses: actions/download-artifact@master
         with:
-          name: backend-social-network
+          name: saiga-saiga.0.0.1
 
       - name: Fake deploy
-        run: ls backend-social-network-*.jar
+        run: ls saiga-saiga.0.0.1-*.jar
