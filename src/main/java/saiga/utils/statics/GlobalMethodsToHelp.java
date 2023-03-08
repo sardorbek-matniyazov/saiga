@@ -34,7 +34,7 @@ public class GlobalMethodsToHelp {
         try {
             return new BigDecimal(s);
         } catch (NumberFormatException e) {
-            throw new TypesInError("Amount type is non parseable");
+            throw new TypesInError("Amount type is not valid");
         }
     }
 }

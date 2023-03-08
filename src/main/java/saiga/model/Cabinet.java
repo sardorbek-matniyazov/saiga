@@ -51,4 +51,10 @@ public class Cabinet {
     public Cabinet(User user) {
         this.user = user;
     }
+
+    public Cabinet(Long id, User user, BigDecimal balance) {
+        this.id = id;
+        this.user = user;
+        this.balance = balance;
+    }
 }
