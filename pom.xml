@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.uniteam</groupId>
     <artifactId>saiga</artifactId>
-    <version>saiga.0.01</version>
+    <version>saiga.0.0.1</version>
     <name>saiga</name>
     <description>saiga</description>
     <properties>

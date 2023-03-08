@@ -27,7 +27,7 @@ jobs:
         run: mvn clean package
 
       - name: Rename the artifact
-        run: cp target/saiga.0.01.jar saiga.0.01-${{ github.sha }}.jar
+        run: cp target/saiga-saiga.0.0.1.jar saiga-saiga.0.0.1-${{ github.sha }}.jar
 
       - name: Save the artifact
         uses: actions/upload-artifact@master
