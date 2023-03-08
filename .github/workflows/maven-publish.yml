@@ -28,7 +28,5 @@ jobs:
         run: mvn -B package --file pom.xml -DskipTests
       - name: Run Spring Boot app
         run: mvn spring-boot:start --file pom.xml
-
-      - name: Publish to GitHub Packages Apache Maven
         env:
           GITHUB_TOKEN: ${{ github.token }}
