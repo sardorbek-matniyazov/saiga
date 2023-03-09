@@ -20,6 +20,7 @@ import saiga.utils.exceptions.NotFoundException;
 import saiga.utils.statics.MessageResourceHelperFunction;
 
 import static saiga.payload.MyResponse._CREATED;
+import static saiga.payload.MyResponse._OK;
 import static saiga.payload.MyResponse._UPDATED;
 
 @Service
@@ -36,15 +37,16 @@ public record AuthServiceImpl(
     @Override
     public MyResponse signIn(String phoneNumber) {
         final String token = jwtProvider.generateToken(phoneNumber);
-        return _CREATED()
+        return _OK()
                 .setMessage(
                         messageResourceHelper.apply("auth.signIn.success"))
                 .addData(
                         "data",
-                        userDtoMapper.apply(repository.save(
-                                userDetailsService.loadUserByUsername(
+                        userDtoMapper.apply(
+                                repository.save(
+                                    userDetailsService.loadUserByUsername(
                                         phoneNumber
-                                ).setToken(token))))
+                                    ).setToken(token))))
                 .addData("token", token);
     }
 
@@ -55,12 +57,11 @@ public record AuthServiceImpl(
                     String.format(
                             messageResourceHelper.apply("user.already_exist_with_phone"),
                             signUpRequest.phoneNumber()
-                    )
-            );
+                    ));
         final String token = jwtProvider.generateToken(signUpRequest.phoneNumber());
 
         return _CREATED()
-                .addData("data", userDtoMapper().apply(
+                .addData("data", cabinetDTOMapper().apply(
                         cabinetRepository.save(
                                 new Cabinet(
                                         new User(
@@ -72,13 +73,9 @@ public record AuthServiceImpl(
                                                                 signUpRequest.role()
                                                         )
                                                 ),
-                                                token
-                                        )
-                                )
-                        ).getUser()
+                                                token)))
                 )).setMessage(
-                        messageResourceHelper.apply("auth.sigUp.success")
-                )
+                        messageResourceHelper.apply("auth.sigUp.success"))
                 .addData("token", token);
     }
 
@@ -87,7 +84,7 @@ public record AuthServiceImpl(
         if (repository.existsByPhoneNumberAndIdIsNot(updateUserRequest.phoneNumber(), id))
             throw new AlreadyExistsException(
                     String.format(
-                            messageResourceHelper.apply("auth.signIn.success")
+                            messageResourceHelper.apply("user.already_exist_with_phone")
                     )
             );
 

@@ -62,11 +62,11 @@ public class User
     @Enumerated(EnumType.STRING)
     private Status status = ACTIVE;
 
-    public User(String firstName, String lastName, String phoneNumber, Role orElse, String token) {
+    public User(String firstName, String lastName, String phoneNumber, Role role, String token) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
-        this.role = orElse;
+        this.role = role;
         this.currentToken = token;
     }
 
