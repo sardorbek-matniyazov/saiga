@@ -29,4 +29,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             nativeQuery = true
     )
     BigDecimal sumOfBenefitByCabinetToIdAndStatus(Long id, OrderStatus ordered);
+
+    List<Order> findAllByStatus(OrderStatus active);
 }
