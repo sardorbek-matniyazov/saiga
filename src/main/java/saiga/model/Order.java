@@ -26,8 +26,6 @@ import java.time.LocalDateTime;
 
 import static saiga.utils.statics.Constants._COMMENT_LENGTH;
 import static saiga.utils.statics.Constants._ENUM_LENGTH;
-import static saiga.utils.statics.GlobalMethodsToHelp.parseStringMoneyToBigDecimalValue;
-import static saiga.utils.statics.GlobalMethodsToHelp.parseDdMMYyyyStringToDate;
 
 /**
  * @author :  Sardor Matniyazov
@@ -88,8 +86,8 @@ public class Order extends BaseCreatable {
     public Order(
             Cabinet cabinetFrom,
             DirectionRequest direction,
-            String amountOfMoney,
-            String timeWhen,
+            BigDecimal amountOfMoney,
+            Timestamp timeWhen,
             String comment
     ) {
         this(
@@ -98,13 +96,12 @@ public class Order extends BaseCreatable {
                 cabinetFrom,
                 comment
         );
-        this.timeWhen = parseDdMMYyyyStringToDate(timeWhen);
     }
 
     public Order(
             Cabinet currentUsersCabinet,
             DirectionRequest direction,
-            String amountOfMoney,
+            BigDecimal amountOfMoney,
             String comment
     ) {
         this(
@@ -118,7 +115,7 @@ public class Order extends BaseCreatable {
 
     private Order(
             DirectionRequest direction,
-            String amountOfMoney,
+            BigDecimal amountOfMoney,
             Cabinet cabinetFromR,
             String comment
 
@@ -142,7 +139,7 @@ public class Order extends BaseCreatable {
 
         this.type = cabinetFromR.getUser().getRole().getRole() == RoleEnum.DRIVER ? OrderType.FROM_DRIVER : OrderType.FROM_USER;
 
-        this.money = parseStringMoneyToBigDecimalValue(amountOfMoney);
+        this.money = amountOfMoney;
 
         this.comment = comment;
 

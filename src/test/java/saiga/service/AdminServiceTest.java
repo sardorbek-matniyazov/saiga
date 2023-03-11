@@ -22,6 +22,7 @@ import saiga.service.impl.AdminServiceImpl;
 import saiga.utils.exceptions.AlreadyExistsException;
 import saiga.utils.exceptions.NotFoundException;
 import saiga.utils.exceptions.TypesInError;
+import saiga.utils.statics.GlobalMethodsToHelp;
 import saiga.utils.statics.MessageResourceHelperFunction;
 
 import java.math.BigDecimal;
@@ -44,7 +45,7 @@ import static org.mockito.Mockito.verify;
 class AdminServiceTest {
     @Mock private CabinetRepository cabinetRepository;
     @Mock private AddressRepository addressRepository;
-
+    private GlobalMethodsToHelp globalMethodsToHelp;
     @Mock private CabinetDTOMapper cabinetDTOMapper;
     @Mock private MessageResourceHelperFunction messageResourceHelper;
 
@@ -52,7 +53,9 @@ class AdminServiceTest {
 
     @BeforeEach
     void setUp() {
-        adminService = new AdminServiceImpl(cabinetRepository, addressRepository, cabinetDTOMapper, messageResourceHelper);
+        globalMethodsToHelp = new GlobalMethodsToHelp();
+        adminService = new AdminServiceImpl(cabinetRepository, addressRepository,
+                cabinetDTOMapper, messageResourceHelper, globalMethodsToHelp);
     }
 
     @Test

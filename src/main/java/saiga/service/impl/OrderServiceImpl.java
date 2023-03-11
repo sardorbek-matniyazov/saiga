@@ -19,16 +19,17 @@ import saiga.service.OrderService;
 import saiga.service.OrderDeliverService;
 import saiga.utils.exceptions.BadRequestException;
 import saiga.utils.exceptions.NotFoundException;
+import saiga.utils.statics.GlobalMethodsToHelp;
 import saiga.utils.statics.MessageResourceHelperFunction;
 
+import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static saiga.payload.MyResponse._CREATED;
 import static saiga.payload.MyResponse._UPDATED;
 import static saiga.utils.statics.Constants._ORDER_TAX;
-import static saiga.utils.statics.GlobalMethodsToHelp.getCurrentUser;
-import static saiga.utils.statics.GlobalMethodsToHelp.parseStringMoneyToBigDecimalValue;
 
 /**
  * @author :  Sardor Matniyazov
@@ -42,20 +43,27 @@ public record OrderServiceImpl(
         OrderDTOMapper orderDTOMapper,
         OrderDeliverService orderDeliverSocketServiceImpl,
         OrderDeliverService orderDeliverTelegramServiceImpl,
-        MessageResourceHelperFunction messageResourceHelper
+        MessageResourceHelperFunction messageResourceHelper,
+        GlobalMethodsToHelp globalMethodsToHelp
 ) implements OrderService {
     @Override
     public MyResponse driversOrder(DriverOrderRequest driverOrderRequest) {
         // get cabinet of current user
         final Cabinet currentUsersCabinet = getCurrentUsersCabinet();
 
+        // parse date format to timestamp
+        final Timestamp timestamp = globalMethodsToHelp.parseDdMMYyyyStringToDate(driverOrderRequest.timeWhen());
+
+        // check if amount value is valid decimal
+        globalMethodsToHelp.isValidDecimalValue(driverOrderRequest.amountOfMoney());
+
         // saving order
         final Order savedOrder = saveOrderToDatabase(
                 new Order(
                         currentUsersCabinet,
                         driverOrderRequest.direction(),
-                        driverOrderRequest.amountOfMoney(),
-                        driverOrderRequest.timeWhen(),
+                        new BigDecimal(driverOrderRequest.amountOfMoney()),
+                        timestamp,
                         driverOrderRequest.comment()
                 )
         );
@@ -76,12 +84,15 @@ public record OrderServiceImpl(
     public MyResponse usersOrder(UserOrderRequest userOrderRequest) {
         final Cabinet currentUsersCabinet = getCurrentUsersCabinet();
 
+        // check amount value is valid
+        globalMethodsToHelp.isValidDecimalValue(userOrderRequest.amountOfMoney());
+
         // users order are saving
         final Order savedOrder = saveOrderToDatabase(
                 new Order(
                         currentUsersCabinet,
                         userOrderRequest.direction(),
-                        userOrderRequest.amountOfMoney(),
+                        new BigDecimal(userOrderRequest.amountOfMoney()),
                         userOrderRequest.comment()
                 )
         );
@@ -165,8 +176,11 @@ public record OrderServiceImpl(
             throw new BadRequestException(
                     messageResourceHelper.apply("order.already_ended"));
 
+        // check if order amount is valid
+        globalMethodsToHelp.isValidDecimalValue(orderEndRequest.orderMoney());
+
         // money of clients screen
-        order.setMoney(parseStringMoneyToBigDecimalValue(orderEndRequest.orderMoney()));
+        order.setMoney(new BigDecimal(orderEndRequest.orderMoney()));
 
         // set length of the taken way
         order.setLengthOfWay(orderEndRequest.OrderLengthOfWay());
@@ -258,7 +272,7 @@ public record OrderServiceImpl(
 
     private Cabinet getCurrentUsersCabinet() {
         // get current authenticated user
-        final User currentUser = getCurrentUser();
+        final User currentUser = globalMethodsToHelp.getCurrentUser();
 
         return cabinetRepository.findByUserId(currentUser.getId()).orElseThrow(
                 () -> new NotFoundException(

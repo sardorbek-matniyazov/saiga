@@ -1,10 +1,10 @@
 package saiga.utils.statics;
 
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import saiga.model.User;
 import saiga.utils.exceptions.TypesInError;
 
-import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -14,8 +14,9 @@ import java.text.SimpleDateFormat;
  * @mailto :  sardorbekmatniyazov03@gmail.com
  * @created : 29 Jan 2023
  **/
+@Component
 public class GlobalMethodsToHelp {
-    public static Timestamp parseDdMMYyyyStringToDate(String s) {
+    public Timestamp parseDdMMYyyyStringToDate(String s) {
         final Timestamp parse;
         try {
             // todo: hour pattern should be added
@@ -26,14 +27,14 @@ public class GlobalMethodsToHelp {
         return parse;
     }
 
-    public static User getCurrentUser() {
+    public User getCurrentUser() {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
-    public static BigDecimal parseStringMoneyToBigDecimalValue(String s) {
-        try {
-            return new BigDecimal(s);
-        } catch (NumberFormatException e) {
+    public void isValidDecimalValue(String s) {
+        if (s.matches("^[1-9]\\d*(\\.\\d+)?$")) {
+            return;
+        } else {
             throw new TypesInError("Amount type is not valid");
         }
     }

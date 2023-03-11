@@ -6,8 +6,6 @@ import org.springframework.stereotype.Component;
 import java.util.Locale;
 import java.util.function.Function;
 
-import static saiga.utils.statics.GlobalMethodsToHelp.getCurrentUser;
-
 /**
  * @author :  Sardor Matniyazov
  * @mailto :  sardorbekmatniyazov03@gmail.com
@@ -15,7 +13,8 @@ import static saiga.utils.statics.GlobalMethodsToHelp.getCurrentUser;
  **/
 @Component
 public record MessageResourceHelperFunction (
-        MessageSource messageSource
+        MessageSource messageSource,
+        GlobalMethodsToHelp globalMethodsToHelp
 ) implements Function<String, String> {
     @Override
     public String apply(String code) {
@@ -23,10 +22,10 @@ public record MessageResourceHelperFunction (
             return messageSource.getMessage(
                     code,
                     null,
-                    switch (getCurrentUser().getLang()) {
-                        case KAA -> Locale.forLanguageTag("KAA");
+                    switch (globalMethodsToHelp.getCurrentUser().getLang()) {
+                        case KAA -> Locale.forLanguageTag("KA");
                         case UZ -> Locale.forLanguageTag("UZ");
-                        case RUS -> Locale.forLanguageTag("RUS");
+                        case RUS -> Locale.forLanguageTag("RU");
                         default -> Locale.ENGLISH;
                     }
             );

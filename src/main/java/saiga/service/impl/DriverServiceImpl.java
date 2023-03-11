@@ -9,13 +9,13 @@ import saiga.repository.CabinetRepository;
 import saiga.repository.OrderRepository;
 import saiga.service.DriverService;
 import saiga.utils.exceptions.NotFoundException;
+import saiga.utils.statics.GlobalMethodsToHelp;
 import saiga.utils.statics.MessageResourceHelperFunction;
 
 import java.math.BigDecimal;
 
 import static saiga.model.enums.OrderStatus.ORDERED;
 import static saiga.utils.statics.Constants._ORDER_TAX;
-import static saiga.utils.statics.GlobalMethodsToHelp.getCurrentUser;
 
 /**
  * @author :  Sardor Matniyazov
@@ -26,11 +26,12 @@ import static saiga.utils.statics.GlobalMethodsToHelp.getCurrentUser;
 public record DriverServiceImpl(
         CabinetRepository cabinetRepository,
         OrderRepository orderRepository,
-        MessageResourceHelperFunction messageResourceHelper
+        MessageResourceHelperFunction messageResourceHelper,
+        GlobalMethodsToHelp globalMethodsToHelp
 ) implements DriverService {
     @Override
     public MyResponse getBalanceInOut() {
-        final User currentUser = getCurrentUser();
+        final User currentUser = globalMethodsToHelp.getCurrentUser();
         final Cabinet currentCabinet = cabinetRepository.findByUserId(currentUser.getId()).orElseThrow(
                 () -> new NotFoundException(
                         String.format(

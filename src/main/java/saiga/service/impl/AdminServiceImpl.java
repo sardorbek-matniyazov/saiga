@@ -15,13 +15,14 @@ import saiga.repository.CabinetRepository;
 import saiga.service.AdminService;
 import saiga.utils.exceptions.AlreadyExistsException;
 import saiga.utils.exceptions.NotFoundException;
+import saiga.utils.statics.GlobalMethodsToHelp;
 import saiga.utils.statics.MessageResourceHelperFunction;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static saiga.payload.MyResponse._CREATED;
 import static saiga.payload.MyResponse._UPDATED;
-import static saiga.utils.statics.GlobalMethodsToHelp.parseStringMoneyToBigDecimalValue;
 
 /**
  * @author :  Sardor Matniyazov
@@ -33,7 +34,8 @@ public record AdminServiceImpl(
         CabinetRepository cabinetRepository,
         AddressRepository addressRepository,
         CabinetDTOMapper cabinetDTOMapper,
-        MessageResourceHelperFunction messageResourceHelper
+        MessageResourceHelperFunction messageResourceHelper,
+        GlobalMethodsToHelp globalMethodsToHelp
 ) implements AdminService {
     @Override
     public List<CabinetDTO> getAllCabinets() {
@@ -84,7 +86,10 @@ public record AdminServiceImpl(
                 )
         );
 
-        cabinet.setBalance(cabinet.getBalance().add(parseStringMoneyToBigDecimalValue(topUpBalanceRequest.amount())));
+        // check amount is valid
+        globalMethodsToHelp.isValidDecimalValue(topUpBalanceRequest.amount());
+
+        cabinet.setBalance(cabinet.getBalance().add(new BigDecimal(topUpBalanceRequest.amount())));
 
         return _UPDATED()
                 .setMessage(
