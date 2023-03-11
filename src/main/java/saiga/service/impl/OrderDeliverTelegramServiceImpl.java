@@ -130,19 +130,9 @@ public record OrderDeliverTelegramServiceImpl (
                     
                     
                     
-                    <b>Direction:</b> <i>%s</i> to <i>%s</i>
-                    <b>Amount of money:</b> <i>%s</i>
-                    <b>Time when:</b> <i>%s</i>
-                    <b>Comment:</b> <i>%s</i>
-                    <b>Driver: </b> <i>%s</i> <i>%s</i>
+                    <b>id: </b> <i>%s</i>
                     """.formatted(
-                    orderDTO.direction().getAddressFrom().getTitle(),
-                    orderDTO.direction().getAddressTo().getTitle(),
-                    orderDTO.money(),
-                    orderDTO.timeWhen(),
-                    orderDTO.comment(),
-                    orderDTO.fromUser().firstName(),
-                    orderDTO.fromUser().lastName());
+                    orderDTO.id());
             case FROM_USER -> """
                     <b>Order Canceled</b>
                     
