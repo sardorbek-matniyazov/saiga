@@ -11,6 +11,6 @@ import saiga.payload.dto.OrderDTO;
 public interface OrderDeliverService {
     void sendOrderToClient(OrderDTO order, OrderType type);
     void sendReceivedOrderToClient(OrderDTO order, OrderType type);
-
     void sendCanceledOrderToClient(OrderDTO order, OrderType type);
+    void sendEndOrderToClient(OrderDTO order);
 }

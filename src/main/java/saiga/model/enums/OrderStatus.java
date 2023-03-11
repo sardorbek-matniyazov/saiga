@@ -8,5 +8,6 @@ package saiga.model.enums;
 public enum OrderStatus {
     ACTIVE,
     RECEIVED,
-    ORDERED
+    ORDERED,
+    DELETED
 }

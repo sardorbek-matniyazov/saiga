@@ -163,4 +163,33 @@ public record OrderDeliverTelegramServiceImpl (
                     orderDTO.fromUser().lastName());
         };
     }
+
+    @Override
+    public void sendEndOrderToClient(OrderDTO order) {
+        String text = """
+                <b>Order Ended</b>
+                
+                
+                
+                <b>Direction:</b> <i>%s</i> to <i>%s</i>
+                <b>Amount of money:</b> <i>%s</i>
+                <b>Time when:</b> <i>%s</i>
+                <b>Comment:</b> <i>%s</i>
+                <b>Driver: </b> <i>%s</i> <i>%s</i>
+                """.formatted(
+                order.direction().getAddressFrom().getTitle(),
+                order.direction().getAddressTo().getTitle(),
+                order.money(),
+                order.timeWhen(),
+                order.comment(),
+                order.fromUser().firstName(),
+                order.fromUser().lastName());
+        TgSendMessage tgSendMessage = new TgSendMessage(
+                telegramProperties.getGroupId(),
+                text,
+                ParseMode.HTML,
+                null
+        );
+        telegramFeignClient.sendMessageToTelegram(telegramProperties.getBotUrl(), tgSendMessage);
+    }
 }

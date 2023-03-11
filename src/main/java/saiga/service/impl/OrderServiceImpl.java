@@ -68,11 +68,14 @@ public record OrderServiceImpl(
                 )
         );
 
+        // make orderDto
+        final OrderDTO orderDTO = orderDTOMapper.apply(savedOrder);
+
         // emitting to socket client
-        emitNewOrderToSocket(savedOrder);
+        emitNewOrderToSocket(orderDTO, savedOrder.getType());
 
         // sending order to telegram
-        emitNewOrderToTelegram(savedOrder);
+        emitNewOrderToTelegram(orderDTO, savedOrder.getType());
 
         return _CREATED()
                 .setMessage(
@@ -97,16 +100,19 @@ public record OrderServiceImpl(
                 )
         );
 
+        // make orderDto
+        final OrderDTO orderDTO = orderDTOMapper.apply(savedOrder);
+
         // emitting to socket client
-        emitNewOrderToSocket(savedOrder);
+        emitNewOrderToSocket(orderDTO, savedOrder.getType());
 
         // sending order to telegram
-        emitNewOrderToTelegram(savedOrder);
+        emitNewOrderToTelegram(orderDTO, savedOrder.getType());
 
         return _CREATED()
                 .setMessage(
                         messageResourceHelper.apply("order.created_success"))
-                .addData("data", orderDTOMapper.apply(savedOrder));
+                .addData("data", orderDTO);
     }
 
     @Override
@@ -141,16 +147,19 @@ public record OrderServiceImpl(
 
         order = saveOrderToDatabase(order);
 
+        // make orderDto
+        final OrderDTO orderDTO = orderDTOMapper.apply(order);
+
         // emit received order to socket client
-        emitReceivedOrderToSocket(order);
+        emitReceivedOrderToSocket(orderDTO, order.getType());
 
         // sending order to telegram
-        emitReceivedOrderToTelegram(order);
+        emitReceivedOrderToTelegram(orderDTO, order.getType());
 
         return _CREATED()
                 .setMessage(
                         messageResourceHelper.apply("order.created_success"))
-                .addData("data", orderDTOMapper.apply(order));
+                .addData("data", orderDTO);
     }
 
     @Override
@@ -190,6 +199,12 @@ public record OrderServiceImpl(
 
         saveOrderToDatabase(order);
 
+        // make orderDto
+        final OrderDTO orderDTO = orderDTOMapper.apply(order);
+
+        // send order to socket client
+        emitEndOrderToSocket(orderDTO);
+
         return _UPDATED().setMessage(
                 messageResourceHelper.apply("order.end_success"));
     }
@@ -224,13 +239,16 @@ public record OrderServiceImpl(
         order.setCabinetTo(null);
 
         // save changed order to database
-        saveOrderToDatabase(order);
+        order = saveOrderToDatabase(order);
+
+        // make orderDto
+        final OrderDTO orderDTO = orderDTOMapper.apply(order);
 
         // emit canceled order to socket
-        emitNewOrderToSocket(order);
+        emitNewOrderToSocket(orderDTO, order.getType());
 
         // emit canceled order to telegram
-        emitNewOrderToTelegram(order);
+        emitNewOrderToTelegram(orderDTO, order.getType());
 
         return _UPDATED().setMessage(
                 messageResourceHelper.apply("order.cancel_success"));
@@ -256,18 +274,23 @@ public record OrderServiceImpl(
                     messageResourceHelper.apply("order.cant_cancel_somebody's_order")
             );
 
-        // deleting canceled order, maybe later we use status instead of delete it
-        repository.deleteById(id);
+        // status changing canceled to order, maybe later we use status instead of delete it
+        order.setStatus(OrderStatus.DELETED);
+        final Order savedOrder = saveOrderToDatabase(order);
+
+        // make orderDto
+        final OrderDTO orderDTO = orderDTOMapper.apply(savedOrder);
 
         // emitting deleted order to socket
-        emitDeletedOrderToSocket(order);
+        emitDeletedOrderToSocket(orderDTO, order.getType());
 
         // emitting deleted order to Telegram
-        emitDeletedOrderToTelegram(order);
+        emitDeletedOrderToTelegram(orderDTO, order.getType());
+
         return _UPDATED()
                 .setMessage(
                         messageResourceHelper.apply("order.deleted_success"))
-                .addData("data", orderDTOMapper.apply(order));
+                .addData("data", orderDTO);
     }
 
     private Cabinet getCurrentUsersCabinet() {
@@ -311,27 +334,35 @@ public record OrderServiceImpl(
         }
     }
 
-    private void emitNewOrderToSocket(Order order) {
-        orderDeliverSocketServiceImpl.sendOrderToClient(orderDTOMapper.apply(order), order.getType());
+    private void emitNewOrderToSocket(OrderDTO orderDTO, OrderType type) {
+        orderDeliverSocketServiceImpl.sendOrderToClient(orderDTO, type);
     }
 
-    private void emitReceivedOrderToSocket(Order order) {
-        orderDeliverSocketServiceImpl.sendReceivedOrderToClient(orderDTOMapper.apply(order), order.getType());
+    private void emitReceivedOrderToSocket(OrderDTO orderDTO, OrderType type) {
+        orderDeliverSocketServiceImpl.sendReceivedOrderToClient(orderDTO, type);
     }
 
-    private void emitNewOrderToTelegram(Order order) {
-        orderDeliverTelegramServiceImpl.sendOrderToClient(orderDTOMapper.apply(order), order.getType());
+    private void emitNewOrderToTelegram(OrderDTO orderDTO, OrderType type) {
+        orderDeliverTelegramServiceImpl.sendOrderToClient(orderDTO, type);
     }
 
-    private void emitReceivedOrderToTelegram(Order order) {
-        orderDeliverTelegramServiceImpl.sendReceivedOrderToClient(orderDTOMapper.apply(order), order.getType());
+    private void emitReceivedOrderToTelegram(OrderDTO orderDTO, OrderType type) {
+        orderDeliverTelegramServiceImpl.sendReceivedOrderToClient(orderDTO, type);
     }
 
-    private void emitDeletedOrderToSocket(Order order) {
-        orderDeliverSocketServiceImpl.sendCanceledOrderToClient(orderDTOMapper.apply(order), order.getType());
+    private void emitDeletedOrderToSocket(OrderDTO orderDTO, OrderType type) {
+        orderDeliverSocketServiceImpl.sendCanceledOrderToClient(orderDTO, type);
     }
 
-    private void emitDeletedOrderToTelegram(Order order) {
-        orderDeliverTelegramServiceImpl.sendCanceledOrderToClient(orderDTOMapper.apply(order), order.getType());
+    private void emitDeletedOrderToTelegram(OrderDTO orderDTO, OrderType type) {
+        orderDeliverTelegramServiceImpl.sendCanceledOrderToClient(orderDTO, type);
+    }
+
+    private void emitEndOrderToSocket(OrderDTO orderDTO) {
+        orderDeliverSocketServiceImpl.sendEndOrderToClient(orderDTO);
+    }
+
+    private void emitEndOrderToTelegram(OrderDTO orderDTO) {
+        orderDeliverTelegramServiceImpl.sendEndOrderToClient(orderDTO);
     }
 }

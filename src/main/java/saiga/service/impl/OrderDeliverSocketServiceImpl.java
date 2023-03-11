@@ -71,4 +71,15 @@ public record OrderDeliverSocketServiceImpl(
             );
         }
     }
+
+    @Override
+    public void sendEndOrderToClient(OrderDTO order) {
+        final MyResponse myResponse = _UPDATED()
+                .setMessage("Order received")
+                .addData("order", order);
+        messagingTemplate.convertAndSend(
+                "/topic/end-order",
+                myResponse
+        );
+    }
 }
