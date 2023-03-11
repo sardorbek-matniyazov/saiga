@@ -34,7 +34,7 @@ public record OrderDeliverTelegramServiceImpl (
                     <b>Driver: </b> <i>%s</i> <i>%s</i>
                     """.formatted(
                     orderDTO.direction().getAddressFrom().getTitle(),
-                    orderDTO.direction().getAddressTo().getTitle(),
+                    orderDTO.direction().getAddressTo() == null ? "No address" : orderDTO.direction().getAddressTo().getTitle(),
                     orderDTO.money(),
                     orderDTO.timeWhen(),
                     orderDTO.comment(),
