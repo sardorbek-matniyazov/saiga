@@ -52,7 +52,7 @@ public record OrderServiceImpl(
         final Cabinet currentUsersCabinet = getCurrentUsersCabinet();
 
         // parse date format to timestamp
-        final Timestamp timestamp = globalMethodsToHelp.parseDdMMYyyyStringToDate(driverOrderRequest.timeWhen());
+        final Timestamp timestamp = globalMethodsToHelp.parseStringTimeToTimestamp(driverOrderRequest.timeWhen());
 
         // check if amount value is valid decimal
         globalMethodsToHelp.isValidDecimalValue(driverOrderRequest.amountOfMoney());
@@ -190,6 +190,10 @@ public record OrderServiceImpl(
 
         // money of clients screen
         order.setMoney(new BigDecimal(orderEndRequest.orderMoney()));
+
+        // set finished and started times
+        order.setFinishedTimeOfWay(globalMethodsToHelp.parseStringTimeToTimestamp(orderEndRequest.finishedTimeOfWay()));
+        order.setStartedTimeOfWay(globalMethodsToHelp.parseStringTimeToTimestamp(orderEndRequest.startedTimeOfWay()));
 
         // set length of the taken way
         order.setLengthOfWay(orderEndRequest.OrderLengthOfWay());

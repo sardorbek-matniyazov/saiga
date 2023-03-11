@@ -16,11 +16,10 @@ import java.text.SimpleDateFormat;
  **/
 @Component
 public class GlobalMethodsToHelp {
-    public Timestamp parseDdMMYyyyStringToDate(String s) {
+    public Timestamp parseStringTimeToTimestamp(String s) {
         final Timestamp parse;
         try {
-            // todo: hour pattern should be added
-            parse = new Timestamp(new SimpleDateFormat("dd-MM-yyyy").parse(s).getTime());
+            parse = new Timestamp(new SimpleDateFormat("dd-MM-yyyy HH:mm").parse(s).getTime());
         } catch (ParseException e) {
             throw new TypesInError("non parseable date format");
         }

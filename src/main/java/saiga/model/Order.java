@@ -83,6 +83,12 @@ public class Order extends BaseCreatable {
     @Column(name = "length_of_way")
     private Double lengthOfWay;
 
+    @Column(name = "started_time_of_way")
+    private Timestamp startedTimeOfWay;
+
+    @Column(name = "finished_time_of_way")
+    private Timestamp finishedTimeOfWay;
+
     public Order(
             Cabinet cabinetFrom,
             DirectionRequest direction,
