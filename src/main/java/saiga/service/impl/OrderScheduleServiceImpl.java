@@ -37,11 +37,11 @@ public class OrderScheduleServiceImpl implements OrderScheduleService {
     }
 
     @Override
-    @Scheduled(cron = "0 0/1 * * * *")
+    @Scheduled(cron = "0 0/5 * * * *")
     public void deleteOrderEachFiveMinutes() {
         final int size = orderRepository.findAllByStatus(OrderStatus.ACTIVE)
                 .stream()
-                .filter(order -> order.getCreatedDate().toLocalDateTime().plusMinutes(1).isBefore(LocalDateTime.now()))
+                .filter(order -> order.getCreatedDate().toLocalDateTime().plusMinutes(10).isBefore(LocalDateTime.now()))
                 .map(order -> {
                     order.setStatus(OrderStatus.DELETED);
                     // save order
