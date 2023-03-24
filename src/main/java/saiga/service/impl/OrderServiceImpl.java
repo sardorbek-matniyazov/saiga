@@ -7,6 +7,7 @@ import saiga.model.Order;
 import saiga.model.User;
 import saiga.model.enums.OrderStatus;
 import saiga.model.enums.OrderType;
+import saiga.model.enums.Status;
 import saiga.payload.MyResponse;
 import saiga.payload.dto.OrderDTO;
 import saiga.payload.mapper.OrderDTOMapper;
@@ -117,7 +118,7 @@ public record OrderServiceImpl(
 
     @Override
     public List<OrderDTO> nonReceivedOrders(OrderType type) {
-        return repository.findAllByCabinetToIsNullAndType(Sort.by(Sort.Direction.DESC, "id"), type)
+        return repository.findAllByCabinetToIsNullAndTypeAndStatus(Sort.by(Sort.Direction.DESC, "id"), type, Status.ACTIVE)
                 .stream()
                 .map(orderDTOMapper)
                 .collect(Collectors.toList());

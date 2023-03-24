@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import saiga.model.Order;
 import saiga.model.enums.OrderStatus;
 import saiga.model.enums.OrderType;
+import saiga.model.enums.Status;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.List;
  * @created : 29 Jan 2023
  **/
 public interface OrderRepository extends JpaRepository<Order, Long> {
-    List<Order> findAllByCabinetToIsNullAndType(Sort sort, OrderType type);
+    List<Order> findAllByCabinetToIsNullAndTypeAndStatus(Sort sort, OrderType type, Status status);
 
     List<Order> findAllByCabinetTo_Id(Long id);
 
