@@ -118,7 +118,7 @@ public record OrderServiceImpl(
 
     @Override
     public List<OrderDTO> nonReceivedOrders(OrderType type) {
-        return repository.findAllByCabinetToIsNullAndTypeAndStatus(Sort.by(Sort.Direction.DESC, "id"), type, Status.ACTIVE)
+        return repository.findAllByCabinetToIsNullAndTypeAndStatus(Sort.by(Sort.Direction.DESC, "id"), type, OrderStatus.ACTIVE)
                 .stream()
                 .map(orderDTOMapper)
                 .collect(Collectors.toList());

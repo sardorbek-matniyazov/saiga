@@ -17,7 +17,7 @@ import java.util.List;
  * @created : 29 Jan 2023
  **/
 public interface OrderRepository extends JpaRepository<Order, Long> {
-    List<Order> findAllByCabinetToIsNullAndTypeAndStatus(Sort sort, OrderType type, Status status);
+    List<Order> findAllByCabinetToIsNullAndTypeAndStatus(Sort sort, OrderType type, OrderStatus status);
 
     List<Order> findAllByCabinetTo_Id(Long id);
 
