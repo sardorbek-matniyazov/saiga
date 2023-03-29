@@ -29,7 +29,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConf {
 
     private final Logger logger = Logger.getLogger(SecurityConf.class.getName());
-
     private final MyFilter myFilter;
 
     @Autowired
