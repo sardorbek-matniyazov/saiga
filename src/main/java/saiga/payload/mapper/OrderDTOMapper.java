@@ -23,7 +23,9 @@ public record OrderDTOMapper(
                 order.getDirection(),
                 order.getComment(),
                 order.getMoney(),
-                order.getTimeWhen()
+                order.getTimeWhen(),
+                order.getStartedTimeOfWay(),
+                order.getFinishedTimeOfWay()
         );
     }
 }
