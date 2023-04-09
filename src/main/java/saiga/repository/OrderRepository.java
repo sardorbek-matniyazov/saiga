@@ -25,7 +25,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query(
             value = """
-                    select sum(money) from orders where cabinet_to_cabinet_id = 2 and order_status = 'ORDERED'
+                    select sum(money) from orders where cabinet_to_cabinet_id = ?1 and order_status = 'ORDERED'
                     """,
             nativeQuery = true
     )
