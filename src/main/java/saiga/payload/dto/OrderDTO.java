@@ -18,6 +18,7 @@ public record OrderDTO(
         String comment,
         BigDecimal money,
         Timestamp timeWhen,
+        Double lengthOfWay,
         Timestamp startedTimeOfWay,
         Timestamp finishedTimeOfWay
 ) {

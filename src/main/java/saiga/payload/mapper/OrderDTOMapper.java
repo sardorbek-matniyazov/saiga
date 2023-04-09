@@ -24,6 +24,7 @@ public record OrderDTOMapper(
                 order.getComment(),
                 order.getMoney(),
                 order.getTimeWhen(),
+                order.getLengthOfWay(),
                 order.getStartedTimeOfWay(),
                 order.getFinishedTimeOfWay()
         );
