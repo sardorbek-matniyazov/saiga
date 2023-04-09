@@ -55,6 +55,9 @@ public class MyResponse {
     public static MyResponse _ILLEGAL_TYPES() {
         return new MyResponse(HttpStatus.BAD_REQUEST);
     }
+    public static MyResponse _UNAUTHORIZED() {
+        return new MyResponse(HttpStatus.UNAUTHORIZED);
+    }
     public static MyResponse _OK() {
         return new MyResponse();
     }

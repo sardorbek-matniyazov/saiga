@@ -10,4 +10,6 @@ public interface AuthService {
     MyResponse signUp(SignUpRequest signUpDto);
 
     MyResponse update(Long id, UpdateUserRequest signUpDto);
+
+    MyResponse accessDenied();
 }

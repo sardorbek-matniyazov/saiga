@@ -1,12 +1,7 @@
 package saiga.controller;
 
 import org.springframework.http.HttpEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import saiga.payload.request.SignUpRequest;
 import saiga.payload.request.UpdateUserRequest;
 import saiga.service.AuthService;
@@ -30,5 +25,10 @@ public record AuthController (AuthService service) {
     @PutMapping(value = "{id}")
     public HttpEntity<?> update(@RequestBody @Valid UpdateUserRequest updateUserRequest, @PathVariable Long id) {
         return service.update(id, updateUserRequest).handleResponse();
+    }
+
+    @GetMapping(value = "access-denied")
+    public HttpEntity<?> accessDenied() {
+        return service.accessDenied().handleResponse();
     }
 }

@@ -19,9 +19,7 @@ import saiga.utils.exceptions.AlreadyExistsException;
 import saiga.utils.exceptions.NotFoundException;
 import saiga.utils.statics.MessageResourceHelperFunction;
 
-import static saiga.payload.MyResponse._CREATED;
-import static saiga.payload.MyResponse._OK;
-import static saiga.payload.MyResponse._UPDATED;
+import static saiga.payload.MyResponse.*;
 
 @Service
 public record AuthServiceImpl(
@@ -104,5 +102,12 @@ public record AuthServiceImpl(
                 .addData("token", token)
                 .setMessage(
                         messageResourceHelper.apply("updated"));
+    }
+
+    @Override
+    public MyResponse accessDenied() {
+        return _UNAUTHORIZED()
+                .setMessage(
+                        messageResourceHelper.apply("auth.access_denied"));
     }
 }

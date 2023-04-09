@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import saiga.model.User;
 
+import javax.security.sasl.AuthenticationException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -37,6 +38,9 @@ public class MyFilter extends OncePerRequestFilter {
             User user;
             try {
                  user = service.loadUserByUsername(username);
+                 if (user.getCurrentToken() != null && !user.getCurrentToken().equals(token))
+                     throw new AuthenticationException("Token is not valid");
+//                     redirectToAccessDenied(response);
             } catch (UsernameNotFoundException e) {
                 filterChain.doFilter(request, response);
                 return;
@@ -44,7 +48,15 @@ public class MyFilter extends OncePerRequestFilter {
             UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        } else {
+            response.getWriter().write("Token is not valid");
+//            redirectToAccessDenied(response);
         }
         filterChain.doFilter(request, response);
     }
+
+//    private void redirectToAccessDenied(HttpServletResponse response) throws IOException {
+//        response.setStatus(400);
+//        response.sendRedirect("/access-denied");
+//    }
 }

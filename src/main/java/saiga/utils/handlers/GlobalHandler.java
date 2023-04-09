@@ -4,6 +4,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -17,6 +18,7 @@ import saiga.utils.exceptions.NotFoundException;
 import saiga.utils.exceptions.TypesInError;
 
 import java.net.UnknownHostException;
+import java.nio.file.AccessDeniedException;
 import java.util.logging.Logger;
 
 import static saiga.payload.MyResponse._ALREADY_EXISTS;
@@ -60,6 +62,11 @@ public class GlobalHandler extends ResponseEntityExceptionHandler {
                 "Can't send message to client %s!",
                 e.getMessage()
         ));
+    }
+
+    @ExceptionHandler(value = {AccessDeniedException.class, AuthenticationException.class, AuthenticationException.class})
+    public ResponseEntity<?> handleAccessDenied(AccessDeniedException e) {
+        return _BAD_REQUEST().setMessage(e.getMessage()).handleResponse();
     }
 
     @Override

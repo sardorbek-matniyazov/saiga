@@ -15,14 +15,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import saiga.security.AdminAuthenticationProvider;
 import saiga.security.MyFilter;
 
 import java.util.logging.Logger;
-
-import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
@@ -44,7 +40,9 @@ public class SecurityConf {
                 .antMatcher("/api/**")
                 .authorizeRequests(
                         authorityConfig -> {
-                            authorityConfig.antMatchers("/api/auth/sign-in", "/api/auth/sign-up").permitAll();
+                            authorityConfig.antMatchers(
+                                    "/api/auth/sign-in", "/api/auth/sign-up",
+                                    "/api/auth/access-denied").permitAll();
                             authorityConfig.antMatchers("/ws/**", "/").permitAll();
 
                             // driver privileges
@@ -63,36 +61,41 @@ public class SecurityConf {
                 )
                 .addFilterBefore(myFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().build();
-    }
-
-    @Bean
-    @Order(2)
-    public SecurityFilterChain securityFilterChainForAdmin(HttpSecurity http) throws Exception {
-        return http
-                .csrf().disable().cors().disable()
-                .authorizeRequests(
-                        authorityConfig -> {
-                            authorityConfig.antMatchers("/ws/**", "/").permitAll();
-                            authorityConfig.antMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").hasRole("ADMIN");
-                            authorityConfig.antMatchers(
-                                    "/socket.io.js.map",
-                                    "jquery-3.3.1.min.js",
-                                    "moment-2.24.0.min.js").permitAll();
-
-                            // telegram authority enables
-                            authorityConfig.antMatchers("/telegram/**").permitAll();
-
-                            // admin privileges
-                            authorityConfig.antMatchers("/admin/**").hasRole("ADMIN");
-
-                            authorityConfig.anyRequest().authenticated();
-                        }
-                )
-                .formLogin(withDefaults())
-                .authenticationProvider(new AdminAuthenticationProvider())
+                .and()
+                .exceptionHandling().accessDeniedHandler((request, response, accessDeniedException) -> {
+                    logger.info("Access denied");
+                    response.sendRedirect("/api/auth/access-denied");
+                }).and()
                 .build();
     }
+
+//    @Bean
+//    @Order(2)
+//    public SecurityFilterChain securityFilterChainForAdmin(HttpSecurity http) throws Exception {
+//        return http
+//                .csrf().disable().cors().disable()
+//                .authorizeRequests(
+//                        authorityConfig -> {
+//                            authorityConfig.antMatchers("/ws/**", "/").permitAll();
+//                            authorityConfig.antMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").hasRole("ADMIN");
+//                            authorityConfig.antMatchers(
+//                                    "/socket.io.js.map",
+//                                    "jquery-3.3.1.min.js",
+//                                    "moment-2.24.0.min.js").permitAll();
+//
+//                            // telegram authority enables
+//                            authorityConfig.antMatchers("/telegram/**").permitAll();
+//
+//                            // admin privileges
+//                            authorityConfig.antMatchers("/admin/**").hasRole("ADMIN");
+//
+//                            authorityConfig.anyRequest().authenticated();
+//                        }
+//                )
+//                .formLogin(withDefaults())
+//                .authenticationProvider(new AdminAuthenticationProvider())
+//                .build();
+//    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -111,7 +114,6 @@ public class SecurityConf {
 
     @Bean ApplicationListener<AuthorizationFailureEvent> badCredentialsEventApplicationListener() {
         return event -> {
-
             logger.warning(String.format("User { %s } failed to log in", event.getAuthentication().getName()));
         };
     }
