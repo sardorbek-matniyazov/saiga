@@ -49,7 +49,7 @@ public class MyFilter extends OncePerRequestFilter {
                     new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         } else {
-            response.getWriter().write("Token is not valid");
+//            response.getWriter().write("Token is not valid");
 //            redirectToAccessDenied(response);
         }
         filterChain.doFilter(request, response);
