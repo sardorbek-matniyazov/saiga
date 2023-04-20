@@ -44,6 +44,11 @@ public class SecurityConf {
                                     "/api/auth/sign-in", "/api/auth/sign-up",
                                     "/api/auth/access-denied").permitAll();
                             authorityConfig.antMatchers("/ws/**", "/").permitAll();
+                            authorityConfig.antMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").hasRole("ADMIN");
+                            authorityConfig.antMatchers(
+                                    "/socket.io.js.map",
+                                    "jquery-3.3.1.min.js",
+                                    "moment-2.24.0.min.js").permitAll();
 
                             // driver privileges
                             authorityConfig.antMatchers(
@@ -66,6 +71,24 @@ public class SecurityConf {
                     logger.info("Access denied");
                     response.sendRedirect("/api/auth/access-denied");
                 }).and()
+                .build();
+    }
+
+    @Bean
+    @Order(1)
+    public SecurityFilterChain securityFilterChainForUser(HttpSecurity http) throws Exception {
+        return http
+                .csrf().disable().cors().disable()
+                .antMatcher("/api/**")
+                .authorizeRequests(authorityConfig -> {
+                            authorityConfig.antMatchers("/ws/**", "/").permitAll();
+                            authorityConfig.antMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").hasRole("ADMIN");
+                            authorityConfig.antMatchers(
+                                    "/socket.io.js.map",
+                                    "jquery-3.3.1.min.js",
+                                    "moment-2.24.0.min.js").permitAll();
+                        }
+                )
                 .build();
     }
 

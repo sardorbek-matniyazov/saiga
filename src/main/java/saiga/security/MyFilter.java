@@ -32,7 +32,7 @@ public class MyFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         String token = request.getHeader("Authorization");
-        if (token != null && token.startsWith("Bearer")) {
+        if (token != null && token.startsWith("Bearer") && token.length() > 7) {
             token = token.substring(7);
             String username = jwtProvider.parseToken(token);
             User user;
