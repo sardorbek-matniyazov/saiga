@@ -10,7 +10,8 @@ public interface Constants {
     int _DESC_LENGTH = 20;
     int _COMMENT_LENGTH = 500;
     int _TOKEN_LENGTH = 200;
-    BigDecimal _ORDER_TAX = BigDecimal.valueOf(1000D);
+    BigDecimal _ORDER_TAX = BigDecimal.valueOf(500D);
+    BigDecimal _STARTING_BALANCE = BigDecimal.valueOf(15_000D);
     String _ONLY_DIGITS_REGEX = "[0-9]+";
 
     String _TELEGRAM_BASE_URL = "https://api.telegram.org/";

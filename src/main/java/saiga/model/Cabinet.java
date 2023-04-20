@@ -17,6 +17,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import static saiga.utils.statics.Constants._STARTING_BALANCE;
+
 /**
  * @author :  Sardor Matniyazov
  * @mailto :  sardorbekmatniyazov03@gmail.com
@@ -39,7 +41,7 @@ public class Cabinet {
     private User user;
 
     @Column(name = "cabinet_balance")
-    private BigDecimal balance = BigDecimal.valueOf(100_000L);
+    private BigDecimal balance = _STARTING_BALANCE;
 
     @OneToMany(
             orphanRemoval = true,
