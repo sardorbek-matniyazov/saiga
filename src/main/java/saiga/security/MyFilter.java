@@ -37,26 +37,17 @@ public class MyFilter extends OncePerRequestFilter {
             String username = jwtProvider.parseToken(token);
             User user;
             try {
-                 user = service.loadUserByUsername(username);
-                 if (user.getCurrentToken() != null && !user.getCurrentToken().equals(token))
-                     throw new AuthenticationException("Token is not valid");
-//                     redirectToAccessDenied(response);
+                user = service.loadUserByUsername(username);
+                if (user.getCurrentToken() != null && user.getCurrentToken().equals(token)) {
+                    UsernamePasswordAuthenticationToken authenticationToken =
+                            new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                }
             } catch (UsernameNotFoundException e) {
                 filterChain.doFilter(request, response);
                 return;
             }
-            UsernamePasswordAuthenticationToken authenticationToken =
-                    new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-        } else {
-//            response.getWriter().write("Token is not valid");
-//            redirectToAccessDenied(response);
         }
         filterChain.doFilter(request, response);
     }
-
-//    private void redirectToAccessDenied(HttpServletResponse response) throws IOException {
-//        response.setStatus(400);
-//        response.sendRedirect("/access-denied");
-//    }
 }
