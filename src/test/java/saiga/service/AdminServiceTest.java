@@ -19,6 +19,7 @@ import saiga.payload.request.TopUpBalanceRequest;
 import saiga.repository.AddressRepository;
 import saiga.repository.CabinetRepository;
 import saiga.service.impl.AdminServiceImpl;
+import saiga.service.telegram.TgMainService;
 import saiga.utils.exceptions.AlreadyExistsException;
 import saiga.utils.exceptions.NotFoundException;
 import saiga.utils.exceptions.TypesInError;
@@ -48,6 +49,7 @@ class AdminServiceTest {
     private GlobalMethodsToHelp globalMethodsToHelp;
     @Mock private CabinetDTOMapper cabinetDTOMapper;
     @Mock private MessageResourceHelperFunction messageResourceHelper;
+    @Mock private TgMainService tgMainService;
 
     private AdminService adminService;
 
@@ -55,7 +57,7 @@ class AdminServiceTest {
     void setUp() {
         globalMethodsToHelp = new GlobalMethodsToHelp();
         adminService = new AdminServiceImpl(cabinetRepository, addressRepository,
-                cabinetDTOMapper, messageResourceHelper, globalMethodsToHelp);
+                cabinetDTOMapper, messageResourceHelper, globalMethodsToHelp, tgMainService);
     }
 
     @Test
