@@ -18,11 +18,11 @@ import saiga.utils.exceptions.NotFoundException;
 import saiga.utils.statics.GlobalMethodsToHelp;
 import saiga.utils.statics.MessageResourceHelperFunction;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static saiga.payload.MyResponse._CREATED;
-import static saiga.payload.MyResponse._UPDATED;
+import static saiga.payload.MyResponse.*;
 
 /**
  * @author :  Sardor Matniyazov
@@ -96,5 +96,41 @@ public record AdminServiceImpl(
                         messageResourceHelper.apply("transfer_success")
                 )
                 .addData("data", cabinetDTOMapper.apply(cabinetRepository.save(cabinet)));
+    }
+
+    @Override
+    public MyResponse backupDb() {
+        // Define the database connection parameters
+        String username = "saiga";
+        String password = "this_is_your_password";
+        String database = "saiga";
+        String host = "localhost";
+        String port = "5432"; // Change this to the port number of your database
+
+        // Define the command to execute the database dump
+        String[] command = {"pg_dump", "-U", username, "-h", host, "-p", port, "-F", "c", "-b", "-v", "-f", "database_dump.backup", database};
+
+        // Execute the command and save the output to a file
+        ProcessBuilder processBuilder = new ProcessBuilder(command);
+        Process process = null;
+        try {
+            process = processBuilder.start();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        int exitCode = 0;
+        try {
+            exitCode = process.waitFor();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Check if the command executed successfully
+        if (exitCode == 0) {
+            _OK().setMessage("Database dump completed successfully");
+        } else {
+            _BAD_REQUEST().setMessage("Database dump failed");
+        }
+        return null;
     }
 }

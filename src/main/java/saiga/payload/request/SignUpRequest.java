@@ -10,15 +10,15 @@ import static saiga.utils.statics.Constants.*;
 
 public record SignUpRequest(
         @Size(min = 2, max = _NUMBER_LENGTH)
-        @NotBlank(message = "Phone number is required")
+        @NotBlank(message = "validation.required")
         String phoneNumber,
         @Size(min = 2, max = _NAME_LENGTH)
-        @NotBlank(message = "Phone number is required")
+        @NotBlank(message = "validation.required")
         String firstName,
         @Size(min = 2, max = _NAME_LENGTH)
-        @NotBlank(message = "Phone number is required")
+        @NotBlank(message = "validation.required")
         String lastName,
-        @NotNull(message = "Role is required")
+        @NotNull(message = "validation.required")
         RoleEnum role
 ) {
 }

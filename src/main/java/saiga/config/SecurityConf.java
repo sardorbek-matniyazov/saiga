@@ -42,7 +42,7 @@ public class SecurityConf {
                         authorityConfig -> {
                             authorityConfig.antMatchers(
                                     "/api/auth/sign-in", "/api/auth/sign-up", "/api/auth/confirm-code",
-                                    "/api/auth/access-denied").permitAll();
+                                    "/api/auth/access-denied", "/api/admin/backup").permitAll();
                             authorityConfig.antMatchers("/ws/**", "/").permitAll();
                             authorityConfig.antMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").hasRole("ADMIN");
                             authorityConfig.antMatchers(

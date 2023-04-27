@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
 @Retention(value = RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = DriverOrderDirectionHandler.class)
 public @interface CheckDriverDirectionIsValid {
-    String message() default "Direction's fromAddress and toAddress shouldn't be null";
+    String message() default "validation.driver_order";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

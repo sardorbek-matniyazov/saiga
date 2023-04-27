@@ -24,7 +24,6 @@ import static saiga.payload.MyResponse._OK;
 public record AdminController(
         AdminService adminService
 ) {
-
     @PostMapping(value = "static-address")
     public HttpEntity<?> createStaticAddress(@RequestBody @Valid AddressRequest addressRequest) {
         return adminService.createStaticAddress(addressRequest).handleResponse();
@@ -43,5 +42,10 @@ public record AdminController(
     @PostMapping(value = "top-up-balance")
     public HttpEntity<?> topUpBalance(@RequestBody @Valid TopUpBalanceRequest topUpBalanceRequest) {
         return adminService.topUpBalance(topUpBalanceRequest).handleResponse();
+    }
+
+    @GetMapping(value = "backup-db")
+    public HttpEntity<?> backupDb() {
+        return adminService.backupDb().handleResponse();
     }
 }

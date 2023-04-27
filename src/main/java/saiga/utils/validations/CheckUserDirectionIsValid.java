@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
 @Retention(value = RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = UserOrderDirectionHandler.class)
 public @interface CheckUserDirectionIsValid {
-    String message() default "Direction's fromAddress shouldn't be null";
+    String message() default "validation.user_order";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

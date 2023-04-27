@@ -20,4 +20,6 @@ public interface AdminService {
     List<Address> getAllStaticAddresses();
 
     MyResponse topUpBalance(TopUpBalanceRequest topUpBalanceRequest);
+
+    MyResponse backupDb();
 }

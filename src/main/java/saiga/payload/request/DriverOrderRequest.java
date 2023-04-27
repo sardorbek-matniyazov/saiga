@@ -14,7 +14,7 @@ public record DriverOrderRequest(
         DirectionRequest direction,
         String timeWhen,
         String comment,
-        @NotBlank(message = "Money is required")
+        @NotBlank(message = "validation.required")
         String amountOfMoney
 ) {
 }

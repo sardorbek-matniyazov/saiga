@@ -9,15 +9,15 @@ import javax.validation.constraints.NotNull;
  * @created : 17 Feb 2023
  **/
 public record OrderEndRequest(
-        @NotNull(message = "Order id required")
+        @NotNull(message = "validation.required")
         Long orderId,
-        @NotNull(message = "Order money is required")
+        @NotNull(message = "validation.required")
         String orderMoney,
-        @NotNull(message = "Order Length of Way is required")
+        @NotNull(message = "validation.required")
         Double OrderLengthOfWay,
-        @NotBlank(message = "Order started time of way is required")
+        @NotBlank(message = "validation.required")
         String startedTimeOfWay,
-        @NotBlank(message = "Order finished time of way is required")
+        @NotBlank(message = "validation.required")
         String finishedTimeOfWay
 ) {
 }

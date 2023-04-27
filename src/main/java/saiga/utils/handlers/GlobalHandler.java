@@ -1,5 +1,7 @@
 package saiga.utils.handlers;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,13 +14,17 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import saiga.config.SecurityConf;
+import saiga.payload.MyResponse;
 import saiga.utils.exceptions.AlreadyExistsException;
 import saiga.utils.exceptions.BadRequestException;
 import saiga.utils.exceptions.NotFoundException;
 import saiga.utils.exceptions.TypesInError;
+import saiga.utils.statics.MessageResourceHelperFunction;
 
+import javax.validation.ConstraintViolationException;
 import java.net.UnknownHostException;
 import java.nio.file.AccessDeniedException;
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 import static saiga.payload.MyResponse._ALREADY_EXISTS;
@@ -29,7 +35,14 @@ import static saiga.payload.MyResponse._NOT_FOUND;
 @ControllerAdvice
 public class GlobalHandler extends ResponseEntityExceptionHandler {
 
+    private final MessageResourceHelperFunction messageResourceHelper;
+
     private final java.util.logging.Logger logger = Logger.getLogger(SecurityConf.class.getName());
+
+    @Autowired
+    public GlobalHandler(MessageResourceHelperFunction messageResourceHelper) {
+        this.messageResourceHelper = messageResourceHelper;
+    }
 
     @ExceptionHandler(value = {AlreadyExistsException.class})
     public ResponseEntity<?> handleExists(AlreadyExistsException e) {
@@ -64,6 +77,11 @@ public class GlobalHandler extends ResponseEntityExceptionHandler {
         ));
     }
 
+    @ExceptionHandler(ConstraintViolationException.class)
+    public HttpEntity<?> onConstraintValidationException(ConstraintViolationException e) {
+        return _BAD_REQUEST().setMessage(messageResourceHelper.apply(e.getMessage())).handleResponse();
+    }
+
     @ExceptionHandler(value = {AccessDeniedException.class, AuthenticationException.class, AuthenticationException.class})
     public ResponseEntity<?> handleAccessDenied(AccessDeniedException e) {
         return _BAD_REQUEST().setMessage(e.getMessage()).handleResponse();
@@ -88,7 +106,16 @@ public class GlobalHandler extends ResponseEntityExceptionHandler {
     ) {
         StringBuilder messages = new StringBuilder();
         methodArgumentNotValidException.getBindingResult()
-                .getAllErrors().forEach(it -> messages.append(it.getDefaultMessage()).append(", "));
+                .getFieldErrors().forEach(
+                        it -> {
+                            messages.append(
+                                    String.format(
+                                            messageResourceHelper.apply(it.getDefaultMessage()),
+                                            it.getField()
+                                    )
+                            ).append(", ");
+                        }
+                );
 
         return _BAD_REQUEST().setMessage(messages.substring(0, messages.length() - 2)).handleResponse();
     }

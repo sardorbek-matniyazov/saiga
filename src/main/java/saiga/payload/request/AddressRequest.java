@@ -12,9 +12,9 @@ import static saiga.utils.statics.Constants._TITLE_LENGTH;
 public record AddressRequest(
         double lat,
         double lon,
-        @Size(min = 5, max = _TITLE_LENGTH)
+        @Size(min = 5, max = _TITLE_LENGTH, message = "validation.length")
         String title,
-        @Size(min = 5, max = _TITLE_LENGTH)
+        @Size(min = 5, max = _TITLE_LENGTH, message = "validation.length")
         String district
 ) {
 }

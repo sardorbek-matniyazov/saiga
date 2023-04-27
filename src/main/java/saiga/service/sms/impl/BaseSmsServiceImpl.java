@@ -27,10 +27,14 @@ public record BaseSmsServiceImpl(
     private static final Logger logger = LoggerFactory.getLogger(BaseSmsServiceImpl.class);
     @Override
     public void reloadSmsApi() {
-        final ResponseEntity<SmsLoginResponse> login = smsApiClient.login(
-                smsConfigProperties.getLogin(), smsConfigProperties.getPassword());
-        logger.info(String.format("Sms Api reloaded with status code %s", login.getBody()));
-        final String token = Objects.requireNonNull(login.getBody()).getData().get("token");
-        bearerAuthInterceptor.setToken(String.format("Bearer %s", token));
+        try {
+            final ResponseEntity<SmsLoginResponse> login = smsApiClient.login(
+                    smsConfigProperties.getLogin(), smsConfigProperties.getPassword());
+            logger.info(String.format("Sms Api reloaded with status code %s", login.getBody()));
+            final String token = Objects.requireNonNull(login.getBody()).getData().get("token");
+            bearerAuthInterceptor.setToken(String.format("Bearer %s", token));
+        } catch (Exception e) {
+            logger.warn("Can't load sms host");
+        }
     }
 }
