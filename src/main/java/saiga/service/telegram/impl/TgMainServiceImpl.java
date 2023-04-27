@@ -13,6 +13,8 @@ import saiga.payload.telegram.TgSendMessage;
 import saiga.service.telegram.TgMainService;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 /**
  * @author :  Sardor Matniyazov
@@ -49,10 +51,14 @@ public record TgMainServiceImpl (
 
     @Override
     public void sendFile(String fileName) {
-        SendDocument sendDocument = new SendDocument(
-                telegramProperties.getGroupId(),
-                new InputFile(new File(fileName))
-        );
+        SendDocument sendDocument = null;
+        try {
+            sendDocument = new SendDocument(
+                    telegramProperties.getGroupId(),
+                    new InputFile(new FileInputStream(new File(fileName)), fileName));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         final TgResult tgResult = telegramFeignClient.sendFileToTelegram(telegramProperties.getBotUrl(), sendDocument);
         sendErrorMessage(tgResult.toString());
     }
