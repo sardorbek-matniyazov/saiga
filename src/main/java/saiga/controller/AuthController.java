@@ -2,6 +2,7 @@ package saiga.controller;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.web.bind.annotation.*;
+import saiga.payload.request.ConfirmationCodeRequest;
 import saiga.payload.request.SignUpRequest;
 import saiga.payload.request.UpdateUserRequest;
 import saiga.service.AuthService;
@@ -20,6 +21,11 @@ public record AuthController (AuthService service) {
     @PostMapping(value = "sign-up")
     public HttpEntity<?> signUp(@RequestBody @Valid SignUpRequest signUpRequest) {
         return service.signUp(signUpRequest).handleResponse();
+    }
+
+    @PostMapping(value = "confirm-code")
+    public HttpEntity<?> confirmCode(@RequestBody @Valid ConfirmationCodeRequest confirmationCodeRequest) {
+        return service.confirmCode(confirmationCodeRequest).handleResponse();
     }
 
     @PutMapping(value = "{id}")

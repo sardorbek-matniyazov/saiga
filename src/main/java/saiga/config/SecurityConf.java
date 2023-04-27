@@ -41,7 +41,7 @@ public class SecurityConf {
                 .authorizeRequests(
                         authorityConfig -> {
                             authorityConfig.antMatchers(
-                                    "/api/auth/sign-in", "/api/auth/sign-up",
+                                    "/api/auth/sign-in", "/api/auth/sign-up", "/api/auth/confirm-code",
                                     "/api/auth/access-denied").permitAll();
                             authorityConfig.antMatchers("/ws/**", "/").permitAll();
                             authorityConfig.antMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").hasRole("ADMIN");

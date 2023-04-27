@@ -33,7 +33,7 @@ public record MessageResourceHelperFunction (
             return messageSource.getMessage(
                     code,
                     null,
-                    Locale.ENGLISH
+                    Locale.forLanguageTag("KA")
             );
         }
     }

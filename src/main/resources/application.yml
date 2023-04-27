@@ -26,3 +26,10 @@ telegram:
   botUsername: saiga_nk_bot
   groupId: -1001527780938
   groupName: saiga_nk
+sms:
+  mail: <your_login>
+  pass: <your_pass>
+  from: "5555"
+  message:
+    boss_phone: +998977777777
+    callback_url: "http://0000.uz/test.php"

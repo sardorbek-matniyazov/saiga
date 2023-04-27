@@ -41,8 +41,8 @@ public record DriverServiceImpl(
                 )
         );
 
-        final BigDecimal benefit = orderRepository.sumOfBenefitByCabinetToIdAndStatus(currentCabinet.getId(), ORDERED);
-        final Double balanceOut = orderRepository.countByCabinetToIdAndStatus(currentCabinet.getId(), ORDERED);
+        final BigDecimal benefit         = orderRepository.sumOfBenefitByCabinetToIdAndStatus(currentCabinet.getId(), ORDERED);
+        final Double balanceOut         = orderRepository.countByCabinetToIdAndStatus(currentCabinet.getId(), ORDERED);
 
         final BalanceInOutDTO balance = new BalanceInOutDTO(
                 currentCabinet.getBalance(),

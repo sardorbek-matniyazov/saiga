@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import static saiga.model.enums.Status.ACTIVE;
+import static saiga.model.enums.Status.NON_ACTIVE;
 import static saiga.utils.statics.Constants._ENUM_LENGTH;
 import static saiga.utils.statics.Constants._NAME_LENGTH;
 import static saiga.utils.statics.Constants._NUMBER_LENGTH;
@@ -60,7 +61,7 @@ public class User
 
     @Column(name = "user_status", length = _ENUM_LENGTH)
     @Enumerated(EnumType.STRING)
-    private Status status = ACTIVE;
+    private Status status = NON_ACTIVE;
 
     public User(String firstName, String lastName, String phoneNumber, Role role, String token) {
         this.firstName = firstName;
