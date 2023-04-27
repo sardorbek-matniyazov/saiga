@@ -20,6 +20,7 @@ import saiga.utils.statics.GlobalMethodsToHelp;
 import saiga.utils.statics.MessageResourceHelperFunction;
 
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -120,6 +121,25 @@ public record AdminServiceImpl(
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        // Provide the password to the process
+        OutputStreamWriter writer = new OutputStreamWriter(process.getOutputStream());
+        try {
+            writer.write(password);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            writer.write("\n");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            writer.flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         int exitCode = 0;
         try {
             exitCode = process.waitFor();
