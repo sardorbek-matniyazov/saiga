@@ -12,6 +12,7 @@ import javax.persistence.UniqueConstraint;
 import java.util.function.Predicate;
 
 import static java.time.LocalDateTime.now;
+import static saiga.utils.statics.Constants._CONFIRMATION_CODE_LIMIT;
 import static saiga.utils.statics.Constants._NUMBER_LENGTH;
 
 /**
@@ -21,6 +22,7 @@ import static saiga.utils.statics.Constants._NUMBER_LENGTH;
  **/
 @EqualsAndHashCode(callSuper = true)
 @Getter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "confirmation_codes")
@@ -67,7 +69,7 @@ public class ConfirmationCode extends BaseCreatable implements Predicate<Confirm
     }
 
     public boolean isExpiredByTime() {
-        return this.getCreatedDate().toLocalDateTime().plusMinutes(5).isBefore(now());
+        return this.getCreatedDate().toLocalDateTime().plusMinutes(_CONFIRMATION_CODE_LIMIT).isBefore(now());
     }
 
     public ConfirmationCode resetTries() {
