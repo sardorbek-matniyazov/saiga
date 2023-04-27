@@ -21,5 +21,5 @@ import saiga.utils.statics.Constants;
     TgResult sendMessageToTelegram(@PathVariable String path, TgSendMessage sendMessage);
 
     @PostMapping(value = "{path}/sendDocument")
-    TgResult sendFileToTelegram(@PathVariable String botUrl, SendDocument fileName);
+    TgResult sendFileToTelegram(@PathVariable String path, SendDocument fileName);
 }
