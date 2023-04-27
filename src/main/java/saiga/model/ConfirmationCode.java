@@ -1,6 +1,10 @@
 package saiga.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import saiga.payload.request.ConfirmationCodeRequest;
 
 import javax.persistence.Column;
