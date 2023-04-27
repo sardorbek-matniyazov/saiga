@@ -73,7 +73,7 @@ public class ConfirmationCode extends BaseCreatable implements Predicate<Confirm
     }
 
     public boolean isExpiredByTime() {
-        return this.getCreatedDate().toLocalDateTime().plusMinutes(_CONFIRMATION_CODE_LIMIT).isBefore(now());
+        return this.getUpdatedDate().toLocalDateTime().plusMinutes(_CONFIRMATION_CODE_LIMIT).isBefore(now());
     }
 
     public ConfirmationCode resetTries() {
