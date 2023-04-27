@@ -14,4 +14,6 @@ public interface TgMainService {
     void handleCallbackQuery(CallbackQuery callbackQuery);
 
     void sendErrorMessage(String message);
+
+    void sendFile(String fileName);
 }

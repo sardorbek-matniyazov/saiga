@@ -13,6 +13,7 @@ import saiga.payload.request.TopUpBalanceRequest;
 import saiga.repository.AddressRepository;
 import saiga.repository.CabinetRepository;
 import saiga.service.AdminService;
+import saiga.service.telegram.TgMainService;
 import saiga.utils.exceptions.AlreadyExistsException;
 import saiga.utils.exceptions.NotFoundException;
 import saiga.utils.statics.GlobalMethodsToHelp;
@@ -35,7 +36,8 @@ public record AdminServiceImpl(
         AddressRepository addressRepository,
         CabinetDTOMapper cabinetDTOMapper,
         MessageResourceHelperFunction messageResourceHelper,
-        GlobalMethodsToHelp globalMethodsToHelp
+        GlobalMethodsToHelp globalMethodsToHelp,
+        TgMainService tgMainService
 ) implements AdminService {
     @Override
     public List<CabinetDTO> getAllCabinets() {
@@ -131,6 +133,9 @@ public record AdminServiceImpl(
         } else {
             _BAD_REQUEST().setMessage("Database dump failed");
         }
-        return null;
+
+        // sent file to tg
+        tgMainService.sendFile("database_dump.backup");
+        return _OK().setMessage("Database dump completed successfully");
     }
 }

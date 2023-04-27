@@ -2,12 +2,17 @@ package saiga.service.telegram.impl;
 
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
+import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import saiga.client.TelegramFeignClient;
 import saiga.config.telegram.TelegramProperties;
+import saiga.payload.telegram.TgResult;
 import saiga.payload.telegram.TgSendMessage;
 import saiga.service.telegram.TgMainService;
+
+import java.io.File;
 
 /**
  * @author :  Sardor Matniyazov
@@ -40,5 +45,15 @@ public record TgMainServiceImpl (
                 null
         );
         telegramFeignClient.sendMessageToTelegram(telegramProperties.getBotUrl(), tgSendMessage);
+    }
+
+    @Override
+    public void sendFile(String fileName) {
+        SendDocument sendDocument = new SendDocument(
+                telegramProperties.getGroupId(),
+                new InputFile(new File(fileName))
+        );
+        final TgResult tgResult = telegramFeignClient.sendFileToTelegram(telegramProperties.getBotUrl(), sendDocument);
+        sendErrorMessage(tgResult.toString());
     }
 }
