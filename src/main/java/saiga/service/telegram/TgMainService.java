@@ -12,4 +12,6 @@ public interface TgMainService {
     void handleMessage(Message message);
 
     void handleCallbackQuery(CallbackQuery callbackQuery);
+
+    void sendErrorMessage(String message);
 }

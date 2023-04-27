@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import saiga.config.SecurityConf;
-import saiga.payload.MyResponse;
+import saiga.service.telegram.TgMainService;
 import saiga.utils.exceptions.AlreadyExistsException;
 import saiga.utils.exceptions.BadRequestException;
 import saiga.utils.exceptions.NotFoundException;
@@ -24,7 +24,6 @@ import saiga.utils.statics.MessageResourceHelperFunction;
 import javax.validation.ConstraintViolationException;
 import java.net.UnknownHostException;
 import java.nio.file.AccessDeniedException;
-import java.util.Arrays;
 import java.util.logging.Logger;
 
 import static saiga.payload.MyResponse._ALREADY_EXISTS;
@@ -36,12 +35,14 @@ import static saiga.payload.MyResponse._NOT_FOUND;
 public class GlobalHandler extends ResponseEntityExceptionHandler {
 
     private final MessageResourceHelperFunction messageResourceHelper;
+    private final TgMainService tgMainService;
 
     private final java.util.logging.Logger logger = Logger.getLogger(SecurityConf.class.getName());
 
     @Autowired
-    public GlobalHandler(MessageResourceHelperFunction messageResourceHelper) {
+    public GlobalHandler(MessageResourceHelperFunction messageResourceHelper, TgMainService tgMainService) {
         this.messageResourceHelper = messageResourceHelper;
+        this.tgMainService = tgMainService;
     }
 
     @ExceptionHandler(value = {AlreadyExistsException.class})
@@ -84,6 +85,12 @@ public class GlobalHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = {AccessDeniedException.class, AuthenticationException.class, AuthenticationException.class})
     public ResponseEntity<?> handleAccessDenied(AccessDeniedException e) {
+        return _BAD_REQUEST().setMessage(e.getMessage()).handleResponse();
+    }
+
+    @ExceptionHandler(value = {RuntimeException.class, Exception.class, Error.class})
+    public ResponseEntity<?> handleErrors(Exception e) {
+        tgMainService.sendErrorMessage(e.getMessage());
         return _BAD_REQUEST().setMessage(e.getMessage()).handleResponse();
     }
 

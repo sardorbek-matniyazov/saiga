@@ -37,12 +37,12 @@ public class SecurityConf {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf().disable().cors().disable()
-                .antMatcher("/api/**")
+//                .antMatcher("/api/**")
                 .authorizeRequests(
                         authorityConfig -> {
                             authorityConfig.antMatchers(
                                     "/api/auth/sign-in", "/api/auth/sign-up", "/api/auth/confirm-code",
-                                    "/api/auth/access-denied", "/api/admin/backup").permitAll();
+                                    "/api/auth/access-denied", "/admin/backup-db").permitAll();
                             authorityConfig.antMatchers("/ws/**", "/").permitAll();
                             authorityConfig.antMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").hasRole("ADMIN");
                             authorityConfig.antMatchers(
